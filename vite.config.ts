@@ -7,9 +7,26 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://host.docker.internal:8080',  // 使用 host.docker.internal 訪問主機
         changeOrigin: true,
         secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('代理錯誤詳情:', {
+              message: err.message,
+              code: err.code,
+              stack: err.stack
+            });
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('發送請求詳情:', {
+              method: req.method,
+              url: req.url,
+              headers: proxyReq.getHeaders(),
+              path: proxyReq.path
+            });
+          });
+        },
       }
     }
   }

@@ -12,19 +12,7 @@ export default defineConfig({
         secure: false,
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
-            console.log('代理錯誤詳情:', {
-              message: err.message,
-              code: err.code,
-              stack: err.stack
-            });
-          });
-          proxy.on('proxyReq', (proxyReq, req, _res) => {
-            console.log('發送請求詳情:', {
-              method: req.method,
-              url: req.url,
-              headers: proxyReq.getHeaders(),
-              path: proxyReq.path
-            });
+            console.log('代理錯誤:', err.message);
           });
         },
       }

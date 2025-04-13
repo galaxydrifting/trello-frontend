@@ -4,5 +4,5 @@ import { cleanup } from '@testing-library/react';
 
 // 在每個測試後自動清理
 afterEach(() => {
-  cleanup();
+    cleanup();
 });

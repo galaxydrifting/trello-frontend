@@ -1,13 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/config';
+import { AxiosError, AxiosResponse } from 'axios';
 
 interface LoginForm {
   email: string;
   password: string;
 }
 
-const getErrorMessage = (error: any): string => {
+interface LoginResponse {
+  token: string;
+}
+
+interface ErrorResponse {
+  message: string;
+}
+
+const getErrorMessage = (error: AxiosError<ErrorResponse>): string => {
   if (!error.response) {
     return '無法連接到伺服器，請檢查網路連線';
   }
@@ -34,25 +44,33 @@ const getErrorMessage = (error: any): string => {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<LoginForm>({
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
+
+  const loginMutation = useMutation<AxiosResponse<LoginResponse>, AxiosError<ErrorResponse>, LoginForm>({
+    mutationFn: (data: LoginForm) => {
+      return apiClient.post<LoginResponse>('/auth/login', data);
+    },
+    onSuccess: (response) => {
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        queryClient.invalidateQueries({ queryKey: ['user'] });
+        navigate('/success');
+      }
+    },
+    onError: (error: AxiosError<ErrorResponse>) => {
+      console.error('Login failed:', getErrorMessage(error));
+    },
+    retry: 1,
+    retryDelay: 1000,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); // 清除之前的錯誤訊息
-
-    try {
-      const response = await apiClient.post('/auth/login', formData);
-      if (response.status === 200 && response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        navigate('/success');
-      }
-    } catch (err: any) {
-      setError(getErrorMessage(err));
-    }
+    loginMutation.mutate(formData);
   };
 
   return (
@@ -101,16 +119,25 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
+          {loginMutation.isError && (
+            <div className="text-red-500 text-sm text-center">
+              {getErrorMessage(loginMutation.error)}
+            </div>
           )}
 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={loginMutation.isPending || loginMutation.isSuccess}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white 
+                ${loginMutation.isPending || loginMutation.isSuccess
+                  ? 'bg-indigo-400 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-700'} 
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
             >
-              登入
+              {loginMutation.isPending && '登入中...'}
+              {loginMutation.isSuccess && '登入成功！'}
+              {!loginMutation.isPending && !loginMutation.isSuccess && '登入'}
             </button>
           </div>
         </form>

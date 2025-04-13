@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://host.docker.internal:8080',  // 使用 host.docker.internal 訪問主機
+        target: 'http://host.docker.internal:8080', // 使用 host.docker.internal 訪問主機
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {
@@ -15,7 +15,7 @@ export default defineConfig({
             console.log('代理錯誤:', err.message);
           });
         },
-      }
-    }
-  }
-})
+      },
+    },
+  },
+});

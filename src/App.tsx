@@ -1,5 +1,5 @@
-import { Outlet } from 'react-router-dom'
-import './App.css'
+import { Outlet } from 'react-router-dom';
+import './App.css';
 
 function App() {
   // 在開發時顯示當前環境
@@ -15,7 +15,7 @@ function App() {
         <Outlet />
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

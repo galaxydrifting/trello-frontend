@@ -4,20 +4,20 @@ import LoginPage from '../pages/LoginPage';
 import SuccessPage from '../pages/SuccessPage';
 
 const router = createBrowserRouter([
-    {
+  {
+    path: '/',
+    element: <App />,
+    children: [
+      {
         path: '/',
-        element: <App />,
-        children: [
-            {
-                path: '/',
-                element: <LoginPage />
-            },
-            {
-                path: '/success',
-                element: <SuccessPage />
-            }
-        ]
-    }
+        element: <LoginPage />,
+      },
+      {
+        path: '/success',
+        element: <SuccessPage />,
+      },
+    ],
+  },
 ]);
 
 export default router;

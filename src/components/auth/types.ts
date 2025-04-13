@@ -1,16 +1,16 @@
 import { AxiosError } from 'axios';
 
 export interface LoginForm {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
-    token: string;
+  token: string;
 }
 
 export interface ErrorResponse {
-    message: string;
+  message: string;
 }
 
 export type LoginError = AxiosError<ErrorResponse>;

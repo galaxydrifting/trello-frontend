@@ -1,15 +1,16 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "針對 localhost 啟動 Chrome",
-            "url": "http://localhost:5173",
-            "webRoot": "${workspaceFolder}",
-            "sourceMapPathOverrides": {
-                "/__parcel_source_root/*": "${webRoot}/*"
-            }
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "針對 localhost 啟動 Chrome",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "npm: dev",
+      "sourceMapPathOverrides": {
+        "/__parcel_source_root/*": "${webRoot}/*"
+      }
+    }
+  ]
 }

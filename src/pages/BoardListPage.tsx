@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/config';
 
@@ -7,30 +7,27 @@ interface Board {
   name: string;
 }
 
+const fetchBoards = async () => {
+  const res = await apiClient.post('/graphql/query', {
+    query: `query { boards { id name } }`,
+  });
+  return res.data.data.boards;
+};
+
 const BoardListPage = () => {
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const {
+    data: boards = [],
+    isLoading,
+    isError,
+  } = useQuery<Board[], Error>({
+    queryKey: ['boards'],
+    queryFn: fetchBoards,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    const fetchBoards = async () => {
-      try {
-        const res = await apiClient.post('/graphql/query', {
-          query: `query { boards { id name } }`,
-        });
-        setBoards(res.data.data.boards);
-      } catch {
-        setError('無法取得看板列表');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBoards();
-  }, []);
-
-  if (loading) return <div>載入中...</div>;
-  if (error) return <div>{error}</div>;
+  if (isLoading) return <div>載入中...</div>;
+  if (isError) return <div>無法取得看板列表</div>;
 
   return (
     <div className="p-4">

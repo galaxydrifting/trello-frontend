@@ -4,7 +4,8 @@ import apiClient from '../api/config';
 
 interface Card {
   id: string;
-  name: string;
+  title: string;
+  content: string;
 }
 
 interface List {
@@ -21,7 +22,7 @@ interface Board {
 
 const fetchBoard = async (boardId: string) => {
   const res = await apiClient.post('/graphql/query', {
-    query: `query { board(id: "${boardId}") { id name lists { id name cards { id title } } } }`,
+    query: `query { board(id: "${boardId}") { id name lists { id name cards { id title content } } } }`,
   });
   return res.data.data.board;
 };
@@ -49,9 +50,19 @@ const BoardDetailPage = () => {
         {board.lists.map((list) => (
           <div key={list.id} className="bg-white rounded shadow p-4">
             <h2 className="font-semibold mb-2">{list.name}</h2>
-            {/* 預留 cards 區塊 */}
             <div className="min-h-[40px] bg-gray-50 rounded p-2">
-              {/* 之後可在這裡顯示 cards */}
+              {list.cards.length === 0 ? (
+                <div className="text-gray-400 text-sm">尚無卡片</div>
+              ) : (
+                <ul className="space-y-2">
+                  {list.cards.map((card) => (
+                    <li key={card.id} className="bg-white border rounded p-2 shadow-sm">
+                      <div className="font-medium">{card.title}</div>
+                      <div className="text-gray-600 text-sm">{card.content}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         ))}

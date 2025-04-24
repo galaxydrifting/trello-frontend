@@ -46,27 +46,31 @@ const BoardDetailPage = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {board.lists.map((list) => (
-          <div key={list.id} className="bg-white rounded shadow p-4">
-            <h2 className="font-semibold mb-2">{list.name}</h2>
-            <div className="min-h-[40px] bg-gray-50 rounded p-2">
-              {list.cards.length === 0 ? (
-                <div className="text-gray-400 text-sm">尚無卡片</div>
-              ) : (
-                <ul className="space-y-2">
-                  {list.cards.map((card) => (
-                    <li key={card.id} className="bg-white border rounded p-2 shadow-sm">
-                      <div className="font-medium">{card.title}</div>
-                      <div className="text-gray-600 text-sm">{card.content}</div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+      {board.lists.length === 0 ? (
+        <div className="text-gray-400 text-center py-8">尚無清單</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {board.lists.map((list) => (
+            <div key={list.id} className="bg-white rounded shadow p-4">
+              <h2 className="font-semibold mb-2">{list.name}</h2>
+              <div className="min-h-[40px] bg-gray-50 rounded p-2">
+                {list.cards.length === 0 ? (
+                  <div className="text-gray-400 text-sm">尚無卡片</div>
+                ) : (
+                  <ul className="space-y-2">
+                    {list.cards.map((card) => (
+                      <li key={card.id} className="bg-white border rounded p-2 shadow-sm">
+                        <div className="font-medium">{card.title}</div>
+                        <div className="text-gray-600 text-sm">{card.content}</div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

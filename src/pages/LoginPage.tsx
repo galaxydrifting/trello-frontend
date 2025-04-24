@@ -17,7 +17,7 @@ export default function LoginPage() {
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         queryClient.invalidateQueries({ queryKey: ['user'] });
-        navigate('/success');
+        navigate('/boards'); // 登入後導轉至看板頁面
       }
     },
     onError: (error: LoginError) => {

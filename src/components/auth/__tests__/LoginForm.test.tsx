@@ -1,14 +1,33 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LoginForm } from '../LoginForm';
+import { UseMutationResult } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import type { LoginForm as ILoginForm, LoginResponse, LoginError } from '../types';
 
 describe('LoginForm', () => {
-  const mockLoginMutation = {
+  const mockLoginMutation: UseMutationResult<
+    AxiosResponse<LoginResponse>,
+    LoginError,
+    ILoginForm,
+    unknown
+  > = {
     mutate: vi.fn(),
+    mutateAsync: vi.fn(),
     isPending: false,
     isSuccess: false,
+    isError: false,
+    isIdle: true,
+    status: 'idle',
+    data: undefined,
     error: null,
+    variables: undefined,
+    reset: vi.fn(),
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
   };
 
   beforeEach(() => {
@@ -16,7 +35,7 @@ describe('LoginForm', () => {
   });
 
   it('應該正確渲染表單欄位', () => {
-    render(<LoginForm loginMutation={mockLoginMutation as any} />);
+    render(<LoginForm loginMutation={mockLoginMutation} />);
 
     expect(screen.getByLabelText(/電子郵件/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/密碼/i)).toBeInTheDocument();
@@ -25,7 +44,7 @@ describe('LoginForm', () => {
 
   it('應該允許使用者輸入電子郵件和密碼', async () => {
     const user = userEvent.setup();
-    render(<LoginForm loginMutation={mockLoginMutation as any} />);
+    render(<LoginForm loginMutation={mockLoginMutation} />);
 
     const emailInput = screen.getByLabelText(/電子郵件/i);
     const passwordInput = screen.getByLabelText(/密碼/i);
@@ -39,7 +58,7 @@ describe('LoginForm', () => {
 
   it('應該在提交表單時呼叫 mutation', async () => {
     const user = userEvent.setup();
-    render(<LoginForm loginMutation={mockLoginMutation as any} />);
+    render(<LoginForm loginMutation={mockLoginMutation} />);
 
     const emailInput = screen.getByLabelText(/電子郵件/i);
     const passwordInput = screen.getByLabelText(/密碼/i);
@@ -58,7 +77,7 @@ describe('LoginForm', () => {
 
   it('不應該在表單無效時提交', async () => {
     const user = userEvent.setup();
-    render(<LoginForm loginMutation={mockLoginMutation as any} />);
+    render(<LoginForm loginMutation={mockLoginMutation} />);
 
     // 不輸入任何值直接提交
     const submitButton = screen.getByRole('button');
@@ -68,17 +87,22 @@ describe('LoginForm', () => {
   });
 
   it('應該在有錯誤時顯示錯誤訊息', () => {
-    const mockMutationWithError = {
+    const mockMutationWithError: UseMutationResult<
+      AxiosResponse<LoginResponse>,
+      LoginError,
+      ILoginForm,
+      unknown
+    > = {
       ...mockLoginMutation,
       error: {
         response: {
           status: 401,
           data: { message: '帳號或密碼錯誤' },
         },
-      },
+      } as LoginError,
+      variables: undefined,
     };
-
-    render(<LoginForm loginMutation={mockMutationWithError as any} />);
+    render(<LoginForm loginMutation={mockMutationWithError} />);
     expect(screen.getByText(/帳號或密碼錯誤/)).toBeInTheDocument();
   });
 });

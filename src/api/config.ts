@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type AxiosRequestConfig } from 'axios';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -35,5 +35,15 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// 匯出 attachToken 供測試直接調用
+export function attachToken(config: AxiosRequestConfig): AxiosRequestConfig {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+}
 
 export default apiClient;

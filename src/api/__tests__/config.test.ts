@@ -1,7 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+// 修正 axios mock，確保 create 是 function
+vi.mock('axios', async () => {
+  const actual = await vi.importActual<typeof import('axios')>('axios');
+  const mAxiosInstance = {
+    defaults: { baseURL: import.meta.env.VITE_API_URL || '' },
+    interceptors: {
+      request: { use: vi.fn() },
+      response: { use: vi.fn() },
+    },
+  };
+  return {
+    ...actual,
+    default: {
+      ...mAxiosInstance,
+      create: () => mAxiosInstance,
+    },
+    create: () => mAxiosInstance,
+  };
+});
 import apiClient, { attachToken } from '../config';
-
-vi.mock('axios');
 
 describe('API Client 配置', () => {
   beforeEach(() => {

@@ -11,8 +11,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:ci": "vitest run --coverage --reporter=json --outputFile=./coverage/coverage.json",
-    "type-check": "tsc --noEmit -p tsconfig.app.json"
+    "test:ci": "vitest run --coverage --reporter=json --outputFile=./coverage/coverage.json"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.73.3",

@@ -11,8 +11,8 @@ export default defineConfig({
         target: 'http://host.docker.internal:8080', // 使用 host.docker.internal 訪問主機
         changeOrigin: true,
         secure: false,
-        configure: (proxy, _options) => {
-          proxy.on('error', (err, _req, _res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.log('代理錯誤:', err.message);
           });
         },

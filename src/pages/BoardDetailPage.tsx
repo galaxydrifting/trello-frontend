@@ -37,7 +37,7 @@ const BoardDetailPage = () => {
       title: string;
       content: string;
     }) => createCard(listId, title, content),
-    onSuccess: (_data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
     },
   });

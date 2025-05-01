@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { Board } from '../components/board/types';
 import AddListForm from '../components/board/AddListForm';
 import BoardListWithAddCard from '../components/board/BoardListWithAddCard';
@@ -9,7 +8,6 @@ import { fetchBoard, createList, createCard } from '../api/board';
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
   const queryClient = useQueryClient();
-  const [newListName, setNewListName] = useState('');
 
   const {
     data: board,
@@ -25,7 +23,6 @@ const BoardDetailPage = () => {
   const createListMutation = useMutation({
     mutationFn: (name: string) => createList(boardId!, name),
     onSuccess: () => {
-      setNewListName('');
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
     },
   });
@@ -40,7 +37,7 @@ const BoardDetailPage = () => {
       title: string;
       content: string;
     }) => createCard(listId, title, content),
-    onSuccess: (_data, variables) => {
+    onSuccess: (_data) => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
     },
   });

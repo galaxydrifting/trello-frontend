@@ -17,6 +17,21 @@ const BOARD_DETAIL_QUERY = `query BoardDetail($id: ID!) {
     }
   }
 }`;
+const CREATE_BOARD_MUTATION = `mutation CreateBoard($input: CreateBoardInput!) {
+  createBoard(input: $input) {
+    id
+    name
+    lists {
+      id
+      name
+      cards {
+        id
+        title
+        content
+      }
+    }
+  }
+}`;
 
 export const fetchBoards = async (): Promise<Board[]> => {
   const res = await apiClient.post('/graphql/query', {
@@ -31,4 +46,12 @@ export const fetchBoard = async (boardId: string): Promise<Board> => {
     variables: { id: boardId },
   });
   return res.data.data.board;
+};
+
+export const createBoard = async (name: string): Promise<Board> => {
+  const res = await apiClient.post('/graphql/query', {
+    query: CREATE_BOARD_MUTATION,
+    variables: { input: { name } },
+  });
+  return res.data.data.createBoard;
 };

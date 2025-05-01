@@ -32,6 +32,17 @@ const CREATE_BOARD_MUTATION = `mutation CreateBoard($input: CreateBoardInput!) {
     }
   }
 }`;
+const CREATE_LIST_MUTATION = `mutation CreateList($input: CreateListInput!) {
+  createList(input: $input) {
+    id
+    name
+    cards {
+      id
+      title
+      content
+    }
+  }
+}`;
 
 export const fetchBoards = async (): Promise<Board[]> => {
   const res = await apiClient.post('/graphql/query', {
@@ -54,4 +65,12 @@ export const createBoard = async (name: string): Promise<Board> => {
     variables: { input: { name } },
   });
   return res.data.data.createBoard;
+};
+
+export const createList = async (boardId: string, name: string) => {
+  const res = await apiClient.post('/graphql/query', {
+    query: CREATE_LIST_MUTATION,
+    variables: { input: { boardId, name } },
+  });
+  return res.data.data.createList;
 };

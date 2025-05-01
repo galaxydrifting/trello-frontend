@@ -3,12 +3,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Board } from '../components/board/types';
 import BoardList from '../components/board/BoardList';
-import { fetchBoard, createList } from '../api/board';
+import { fetchBoard, createList, createCard } from '../api/board';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
   const queryClient = useQueryClient();
   const [newListName, setNewListName] = useState('');
+  const [cardInputs, setCardInputs] = useState<Record<string, { title: string; content: string }>>(
+    {}
+  );
 
   const {
     data: board,
@@ -25,6 +28,22 @@ const BoardDetailPage = () => {
     mutationFn: (name: string) => createList(boardId!, name),
     onSuccess: () => {
       setNewListName('');
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+    },
+  });
+
+  const createCardMutation = useMutation({
+    mutationFn: async ({
+      listId,
+      title,
+      content,
+    }: {
+      listId: string;
+      title: string;
+      content: string;
+    }) => createCard(listId, title, content),
+    onSuccess: (_data, variables) => {
+      setCardInputs((prev) => ({ ...prev, [variables.listId]: { title: '', content: '' } }));
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
     },
   });
@@ -64,7 +83,54 @@ const BoardDetailPage = () => {
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {board.lists.map((list) => (
-            <BoardList key={list.id} list={list} />
+            <div key={list.id} className="min-w-[260px]">
+              <BoardList list={list} />
+              <form
+                className="mt-2 flex flex-col gap-1 bg-gray-50 rounded p-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const title = cardInputs[list.id]?.title?.trim() || '';
+                  const content = cardInputs[list.id]?.content?.trim() || '';
+                  if (!title) return;
+                  createCardMutation.mutate({ listId: list.id, title, content });
+                }}
+              >
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 mb-1"
+                  placeholder="卡片標題 (必填)"
+                  value={cardInputs[list.id]?.title || ''}
+                  onChange={(e) =>
+                    setCardInputs((prev) => ({
+                      ...prev,
+                      [list.id]: { ...prev[list.id], title: e.target.value },
+                    }))
+                  }
+                  disabled={createCardMutation.isPending}
+                  required
+                />
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 mb-1"
+                  placeholder="卡片內容 (可選)"
+                  value={cardInputs[list.id]?.content || ''}
+                  onChange={(e) =>
+                    setCardInputs((prev) => ({
+                      ...prev,
+                      [list.id]: { ...prev[list.id], content: e.target.value },
+                    }))
+                  }
+                  disabled={createCardMutation.isPending}
+                />
+                <button
+                  type="submit"
+                  className="bg-green-600 text-white px-2 py-1 rounded disabled:bg-green-300"
+                  disabled={createCardMutation.isPending || !cardInputs[list.id]?.title?.trim()}
+                >
+                  {createCardMutation.isPending ? '新增中...' : '新增卡片'}
+                </button>
+              </form>
+            </div>
           ))}
         </div>
       )}

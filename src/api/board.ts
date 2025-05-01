@@ -50,6 +50,53 @@ const CREATE_CARD_MUTATION = `mutation CreateCard($input: CreateCardInput!) {
     content
   }
 }`;
+const UPDATE_BOARD_MUTATION = `mutation UpdateBoard($input: UpdateBoardInput!) {
+  updateBoard(input: $input) {
+    id
+    name
+    lists {
+      id
+      name
+      cards {
+        id
+        title
+        content
+      }
+    }
+  }
+}`;
+
+const DELETE_BOARD_MUTATION = `mutation DeleteBoard($id: ID!) {
+  deleteBoard(id: $id)
+}`;
+
+const UPDATE_LIST_MUTATION = `mutation UpdateList($input: UpdateListInput!) {
+  updateList(input: $input) {
+    id
+    name
+    cards {
+      id
+      title
+      content
+    }
+  }
+}`;
+
+const DELETE_LIST_MUTATION = `mutation DeleteList($id: ID!) {
+  deleteList(id: $id)
+}`;
+
+const UPDATE_CARD_MUTATION = `mutation UpdateCard($input: UpdateCardInput!) {
+  updateCard(input: $input) {
+    id
+    title
+    content
+  }
+}`;
+
+const DELETE_CARD_MUTATION = `mutation DeleteCard($id: ID!) {
+  deleteCard(id: $id)
+}`;
 
 export const fetchBoards = async (): Promise<Board[]> => {
   const res = await apiClient.post('/graphql/query', {
@@ -88,4 +135,52 @@ export const createCard = async (listId: string, title: string, content: string)
     variables: { input: { listId, title, content } },
   });
   return res.data.data.createCard;
+};
+
+export const updateBoard = async (id: string, name: string): Promise<Board> => {
+  const res = await apiClient.post('/graphql/query', {
+    query: UPDATE_BOARD_MUTATION,
+    variables: { input: { id, name } },
+  });
+  return res.data.data.updateBoard;
+};
+
+export const deleteBoard = async (id: string): Promise<boolean> => {
+  const res = await apiClient.post('/graphql/query', {
+    query: DELETE_BOARD_MUTATION,
+    variables: { id },
+  });
+  return res.data.data.deleteBoard;
+};
+
+export const updateList = async (id: string, name: string) => {
+  const res = await apiClient.post('/graphql/query', {
+    query: UPDATE_LIST_MUTATION,
+    variables: { input: { id, name } },
+  });
+  return res.data.data.updateList;
+};
+
+export const deleteList = async (id: string) => {
+  const res = await apiClient.post('/graphql/query', {
+    query: DELETE_LIST_MUTATION,
+    variables: { id },
+  });
+  return res.data.data.deleteList;
+};
+
+export const updateCard = async (id: string, title: string, content: string) => {
+  const res = await apiClient.post('/graphql/query', {
+    query: UPDATE_CARD_MUTATION,
+    variables: { input: { id, title, content } },
+  });
+  return res.data.data.updateCard;
+};
+
+export const deleteCard = async (id: string) => {
+  const res = await apiClient.post('/graphql/query', {
+    query: DELETE_CARD_MUTATION,
+    variables: { id },
+  });
+  return res.data.data.deleteCard;
 };

@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Board } from '../components/board/types';
-import { fetchBoards, createBoard } from '../api/board';
+import { fetchBoards, createBoard, updateBoard, deleteBoard } from '../api/board';
 import BoardListItem from '../components/board/BoardListItem';
 
 const BoardListPage = () => {
@@ -24,6 +24,20 @@ const BoardListPage = () => {
     mutationFn: createBoard,
     onSuccess: () => {
       setNewBoardName('');
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+    },
+  });
+
+  const updateBoardMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => updateBoard(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+    },
+  });
+
+  const deleteBoardMutation = useMutation({
+    mutationFn: (id: string) => deleteBoard(id),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
@@ -59,7 +73,15 @@ const BoardListPage = () => {
       </form>
       <ul className="space-y-2">
         {boards.map((board) => (
-          <BoardListItem key={board.id} board={board} onClick={(id) => navigate(`/boards/${id}`)} />
+          <BoardListItem
+            key={board.id}
+            board={board}
+            onClick={(id) => navigate(`/boards/${id}`)}
+            onEdit={(id, name) => updateBoardMutation.mutate({ id, name })}
+            onDelete={(id) => deleteBoardMutation.mutate(id)}
+            isEditing={updateBoardMutation.isPending}
+            isDeleting={deleteBoardMutation.isPending}
+          />
         ))}
       </ul>
     </div>

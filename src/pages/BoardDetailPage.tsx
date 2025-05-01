@@ -3,7 +3,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Board } from '../components/board/types';
 import AddListForm from '../components/board/AddListForm';
 import BoardListWithAddCard from '../components/board/BoardListWithAddCard';
-import { fetchBoard, createList, createCard } from '../api/board';
+import {
+  fetchBoard,
+  createList,
+  createCard,
+  updateList,
+  deleteList,
+  updateCard,
+  deleteCard,
+} from '../api/board';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -42,6 +50,35 @@ const BoardDetailPage = () => {
     },
   });
 
+  const updateListMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => updateList(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+    },
+  });
+
+  const deleteListMutation = useMutation({
+    mutationFn: (id: string) => deleteList(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+    },
+  });
+
+  const updateCardMutation = useMutation({
+    mutationFn: ({ id, title, content }: { id: string; title: string; content: string }) =>
+      updateCard(id, title, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+    },
+  });
+
+  const deleteCardMutation = useMutation({
+    mutationFn: (id: string) => deleteCard(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+    },
+  });
+
   if (isLoading) return <div>載入中...</div>;
   if (isError || !board) return <div>無法取得看板資料</div>;
 
@@ -64,6 +101,14 @@ const BoardDetailPage = () => {
                 createCardMutation.mutate({ listId, title, content })
               }
               isPending={createCardMutation.isPending}
+              onEditList={(id, name) => updateListMutation.mutate({ id, name })}
+              onDeleteList={(id) => deleteListMutation.mutate(id)}
+              isEditingList={updateListMutation.isPending}
+              isDeletingList={deleteListMutation.isPending}
+              onEditCard={(id, title, content) => updateCardMutation.mutate({ id, title, content })}
+              onDeleteCard={(id) => deleteCardMutation.mutate(id)}
+              isEditingCard={updateCardMutation.isPending}
+              isDeletingCard={deleteCardMutation.isPending}
             />
           ))}
         </div>

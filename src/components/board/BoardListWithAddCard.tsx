@@ -6,15 +6,45 @@ interface BoardListWithAddCardProps {
   list: List;
   onAddCard: (listId: string, title: string, content: string) => void;
   isPending: boolean;
+  onEditList?: (id: string, name: string) => void;
+  onDeleteList?: (id: string) => void;
+  isEditingList?: boolean;
+  isDeletingList?: boolean;
+  onEditCard?: (id: string, title: string, content: string) => void;
+  onDeleteCard?: (id: string) => void;
+  isEditingCard?: boolean;
+  isDeletingCard?: boolean;
 }
 
-const BoardListWithAddCard = ({ list, onAddCard, isPending }: BoardListWithAddCardProps) => {
+const BoardListWithAddCard = ({
+  list,
+  onAddCard,
+  isPending,
+  onEditList,
+  onDeleteList,
+  isEditingList,
+  isDeletingList,
+  onEditCard,
+  onDeleteCard,
+  isEditingCard,
+  isDeletingCard,
+}: BoardListWithAddCardProps) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
   return (
     <div className="min-w-[260px]">
-      <BoardList list={list} />
+      <BoardList
+        list={list}
+        onEdit={onEditList}
+        onDelete={onDeleteList}
+        isEditing={isEditingList}
+        isDeleting={isDeletingList}
+        onEditCard={onEditCard}
+        onDeleteCard={onDeleteCard}
+        isEditingCard={isEditingCard}
+        isDeletingCard={isDeletingCard}
+      />
       <form
         className="mt-2 flex flex-col gap-1 bg-gray-50 rounded p-2"
         onSubmit={(e) => {

@@ -26,7 +26,7 @@ const BoardDetailPage = () => {
       {board.lists.length === 0 ? (
         <div className="text-gray-400 text-center py-8">尚無清單</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {board.lists.map((list) => (
             <BoardList key={list.id} list={list} />
           ))}

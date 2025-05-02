@@ -98,6 +98,30 @@ const DELETE_CARD_MUTATION = `mutation DeleteCard($id: ID!) {
   deleteCard(id: $id)
 }`;
 
+const MOVE_LIST_MUTATION = `mutation MoveList($input: MoveListInput!) {
+  moveList(input: $input) {
+    id
+    name
+    position
+    cards {
+      id
+      title
+      content
+      position
+    }
+  }
+}`;
+
+const MOVE_CARD_MUTATION = `mutation MoveCard($input: MoveCardInput!) {
+  moveCard(input: $input) {
+    id
+    title
+    content
+    position
+    listId
+  }
+}`;
+
 export const fetchBoards = async (): Promise<Board[]> => {
   const res = await apiClient.post('/graphql/query', {
     query: BOARDS_QUERY,
@@ -183,4 +207,20 @@ export const deleteCard = async (id: string) => {
     variables: { id },
   });
   return res.data.data.deleteCard;
+};
+
+export const moveList = async (id: string, newPosition: number) => {
+  const res = await apiClient.post('/graphql/query', {
+    query: MOVE_LIST_MUTATION,
+    variables: { input: { id, newPosition } },
+  });
+  return res.data.data.moveList;
+};
+
+export const moveCard = async (id: string, targetListId: string, newPosition: number) => {
+  const res = await apiClient.post('/graphql/query', {
+    query: MOVE_CARD_MUTATION,
+    variables: { input: { id, targetListId, newPosition } },
+  });
+  return res.data.data.moveCard;
 };

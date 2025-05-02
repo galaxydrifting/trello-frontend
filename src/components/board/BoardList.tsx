@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SortableCardItem from './SortableCardItem';
 import { List } from './types';
 import BoardCard from './BoardCard';
 
@@ -67,7 +68,7 @@ const BoardList = ({
         </form>
       ) : (
         <div className="flex items-center mb-2 gap-2">
-          <h2 className="font-semibold flex-1 cursor-pointer" onClick={() => setEditMode(true)}>
+          <h2 className="font-semibold flex-1 cursor-move" onClick={() => setEditMode(true)}>
             {list.name}
           </h2>
           <button
@@ -92,14 +93,15 @@ const BoardList = ({
         ) : (
           <ul className="space-y-2">
             {list.cards.map((card) => (
-              <BoardCard
-                key={card.id}
-                card={card}
-                onEdit={onEditCard}
-                onDelete={onDeleteCard}
-                isEditing={isEditingCard}
-                isDeleting={isDeletingCard}
-              />
+              <SortableCardItem key={card.id} id={card.id}>
+                <BoardCard
+                  card={card}
+                  onEdit={onEditCard}
+                  onDelete={onDeleteCard}
+                  isEditing={isEditingCard}
+                  isDeleting={isDeletingCard}
+                />
+              </SortableCardItem>
             ))}
           </ul>
         )}

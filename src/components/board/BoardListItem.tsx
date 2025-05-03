@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Board } from './types';
+import { FaRegEdit, FaRegTrashAlt } from 'react-icons/fa';
 
 type BoardListItemProps = {
   board: Board;
@@ -63,20 +64,26 @@ const BoardListItem = ({
           <span className="flex-1 cursor-pointer" onClick={() => onClick(board.id)}>
             {board.name}
           </span>
-          <button
-            className="text-blue-600 px-2 py-1"
-            onClick={() => setEditMode(true)}
-            disabled={isEditing}
-          >
-            編輯
-          </button>
-          <button
-            className="text-red-600 px-2 py-1"
-            onClick={() => setShowDelete(true)}
-            disabled={isDeleting}
-          >
-            刪除
-          </button>
+          <div className="flex gap-2 items-center ml-auto">
+            <button
+              className="text-gray-400 hover:text-blue-600 transition-colors p-1"
+              onClick={() => setEditMode(true)}
+              disabled={isEditing}
+              title="編輯"
+              aria-label="編輯"
+            >
+              <FaRegEdit size={20} />
+            </button>
+            <button
+              className="text-gray-400 hover:text-red-600 transition-colors p-1"
+              onClick={() => setShowDelete(true)}
+              disabled={isDeleting}
+              title="刪除"
+              aria-label="刪除"
+            >
+              <FaRegTrashAlt size={20} />
+            </button>
+          </div>
         </>
       )}
       {showDelete && (

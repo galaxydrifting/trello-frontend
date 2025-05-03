@@ -69,7 +69,8 @@ const BoardListItem = ({
           </span>
           <div className="flex gap-2 items-center ml-auto">
             <button
-              className="text-gray-400 hover:text-blue-600 transition-colors p-1"
+              className="text-gray-400 hover:text-blue-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none"
+              style={{ boxShadow: 'none', border: 'none' }}
               onClick={() => setEditMode(true)}
               disabled={isEditing}
               title="編輯"
@@ -78,7 +79,8 @@ const BoardListItem = ({
               <FaRegEdit size={20} />
             </button>
             <button
-              className="text-gray-400 hover:text-red-600 transition-colors p-1"
+              className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none"
+              style={{ boxShadow: 'none', border: 'none' }}
               onClick={() => setShowDelete(true)}
               disabled={isDeleting}
               title="刪除"

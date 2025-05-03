@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { FaPlus } from 'react-icons/fa';
 import { Board } from '../components/board/types';
 import { fetchBoards, createBoard, updateBoard, deleteBoard } from '../api/board';
 import BoardListItem from '../components/board/BoardListItem';
@@ -53,11 +54,14 @@ const BoardListPage = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">看板列表</h1>
-      <form className="flex gap-2 mb-4" onSubmit={handleCreateBoard}>
+      <h1 className="text-2xl font-bold mb-6">看板列表</h1>
+      <form
+        className="flex gap-2 mb-8 bg-white rounded-xl shadow-md p-4 items-center"
+        onSubmit={handleCreateBoard}
+      >
         <input
           type="text"
-          className="border rounded px-2 py-1 flex-1"
+          className="border border-indigo-200 rounded-lg px-3 py-2 flex-1 bg-white text-gray-900 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
           placeholder="輸入新看板名稱"
           value={newBoardName}
           onChange={(e) => setNewBoardName(e.target.value)}
@@ -65,13 +69,14 @@ const BoardListPage = () => {
         />
         <button
           type="submit"
-          className="bg-indigo-600 text-white px-4 py-1 rounded disabled:bg-indigo-300"
+          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 disabled:bg-indigo-300 transition font-semibold text-base"
           disabled={createBoardMutation.isPending || !newBoardName.trim()}
         >
+          <FaPlus />
           {createBoardMutation.isPending ? '新增中...' : '新增看板'}
         </button>
       </form>
-      <ul className="space-y-2">
+      <ul className="space-y-4">
         {boards.map((board) => (
           <BoardListItem
             key={board.id}

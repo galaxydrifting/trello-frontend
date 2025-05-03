@@ -24,7 +24,7 @@ const BoardListItem = ({
   const [showDelete, setShowDelete] = useState(false);
 
   return (
-    <li className="p-4 bg-white rounded shadow flex items-center gap-2 hover:bg-gray-100">
+    <li className="p-4 bg-blue-50 rounded-xl shadow-md flex items-center gap-2 hover:bg-blue-100 transition group">
       {editMode ? (
         <form
           className="flex-1 flex gap-2"
@@ -61,7 +61,10 @@ const BoardListItem = ({
         </form>
       ) : (
         <>
-          <span className="flex-1 cursor-pointer" onClick={() => onClick(board.id)}>
+          <span
+            className="flex-1 cursor-pointer font-bold text-lg text-blue-900 group-hover:text-blue-800 transition"
+            onClick={() => onClick(board.id)}
+          >
             {board.name}
           </span>
           <div className="flex gap-2 items-center ml-auto">

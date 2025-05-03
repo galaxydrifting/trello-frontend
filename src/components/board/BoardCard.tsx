@@ -16,7 +16,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
   const [showDelete, setShowDelete] = useState(false);
 
   return (
-    <li className="bg-white border rounded p-2 shadow-sm">
+    <div className="bg-white border rounded p-2 shadow-sm">
       {editMode ? (
         <form
           className="flex flex-col gap-1"
@@ -110,7 +110,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
           </div>
         </div>
       )}
-    </li>
+    </div>
   );
 };
 

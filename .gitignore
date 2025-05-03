@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 
+
 # Editor directories and files
 !.vscode/extensions.json
 .idea
@@ -28,3 +29,5 @@ dist-ssr
 
 # Testing
 coverage/
+
+tsconfig.tsbuildinfo

@@ -1,24 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Board } from '../components/board/types';
 import AddListForm from '../components/board/AddListForm';
 import BoardListWithAddCard from '../components/board/BoardListWithAddCard';
 import SortableListItem from '../components/board/SortableListItem';
-import {
-  fetchBoard,
-  createList,
-  createCard,
-  updateList,
-  deleteList,
-  updateCard,
-  deleteCard,
-  moveList,
-  moveCard,
-} from '../api/board';
+import { fetchBoard, moveList, moveCard } from '../api/board';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { useBoardDnD } from '../hooks/useBoardDnD';
+import { useBoardMutations } from '../hooks/useBoardMutations';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -35,56 +26,14 @@ const BoardDetailPage = () => {
     retry: 1,
   });
 
-  const createListMutation = useMutation({
-    mutationFn: (name: string) => createList(boardId!, name),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-    },
-  });
-
-  const createCardMutation = useMutation({
-    mutationFn: async ({
-      listId,
-      title,
-      content,
-    }: {
-      listId: string;
-      title: string;
-      content: string;
-    }) => createCard(boardId!, listId, title, content),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-    },
-  });
-
-  const updateListMutation = useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) => updateList(id, name),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-    },
-  });
-
-  const deleteListMutation = useMutation({
-    mutationFn: (id: string) => deleteList(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-    },
-  });
-
-  const updateCardMutation = useMutation({
-    mutationFn: ({ id, title, content }: { id: string; title: string; content: string }) =>
-      updateCard(id, title, content),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-    },
-  });
-
-  const deleteCardMutation = useMutation({
-    mutationFn: (id: string) => deleteCard(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-    },
-  });
+  const {
+    createListMutation,
+    createCardMutation,
+    updateListMutation,
+    deleteListMutation,
+    updateCardMutation,
+    deleteCardMutation,
+  } = useBoardMutations(boardId);
 
   const [lists, setLists] = useState<Board['lists']>([]);
   const [localCards, setLocalCards] = useState<Record<string, Board['lists'][0]['cards']>>({});

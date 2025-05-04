@@ -21,8 +21,17 @@ const BoardListPage = () => {
     retry: 1,
   });
 
+  // 依 position 排序
+  const sortedBoards = [...boards].sort((a, b) => a.position - b.position);
+
   const createBoardMutation = useMutation({
-    mutationFn: createBoard,
+    mutationFn: ({ name }: { name: string; position?: number }) => {
+      const boardsData = queryClient.getQueryData<Board[]>(['boards']) || [];
+      const nextPosition = boardsData.length > 0
+        ? Math.max(...boardsData.map((b) => b.position)) + 1
+        : 1;
+      return createBoard(name, nextPosition);
+    },
     onSuccess: () => {
       setNewBoardName('');
       queryClient.invalidateQueries({ queryKey: ['boards'] });
@@ -63,7 +72,9 @@ const BoardListPage = () => {
   const handleCreateBoard = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBoardName.trim()) return;
-    createBoardMutation.mutate(newBoardName.trim());
+    // 計算最大 position + 1
+    const maxPosition = boards.length > 0 ? Math.max(...boards.map((b) => b.position)) : 0;
+    createBoardMutation.mutate({ name: newBoardName.trim(), position: maxPosition + 1 });
   };
 
   if (isLoading) return <div>載入中...</div>;
@@ -94,7 +105,7 @@ const BoardListPage = () => {
         </button>
       </form>
       <ul className="space-y-4">
-        {boards.map((board) => (
+        {sortedBoards.map((board) => (
           <BoardListItem
             key={board.id}
             board={board}

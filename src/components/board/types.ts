@@ -13,5 +13,6 @@ export interface List {
 export interface Board {
   id: string;
   name: string;
+  position: number;
   lists: List[];
 }

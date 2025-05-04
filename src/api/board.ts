@@ -1,7 +1,7 @@
 import apiClient from './config';
 import { Board } from '../components/board/types';
 
-const BOARDS_QUERY = `query { boards { id name } }`;
+const BOARDS_QUERY = `query { boards { id name position } }`;
 const BOARD_DETAIL_QUERY = `query BoardDetail($id: ID!) {
   board(id: $id) {
     id
@@ -21,6 +21,7 @@ const CREATE_BOARD_MUTATION = `mutation CreateBoard($input: CreateBoardInput!) {
   createBoard(input: $input) {
     id
     name
+    position
     lists {
       id
       name
@@ -137,10 +138,10 @@ export const fetchBoard = async (boardId: string): Promise<Board> => {
   return res.data.data.board;
 };
 
-export const createBoard = async (name: string): Promise<Board> => {
+export const createBoard = async (name: string, position: number): Promise<Board> => {
   const res = await apiClient.post('/graphql/query', {
     query: CREATE_BOARD_MUTATION,
-    variables: { input: { name } },
+    variables: { input: { name, position } },
   });
   return res.data.data.createBoard;
 };

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Board } from '../components/board/types';
@@ -10,6 +9,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { useBoardDnD } from '../hooks/useBoardDnD';
 import { useBoardMutations } from '../hooks/useBoardMutations';
+import { useBoardListsState } from '../hooks/useBoardListsState';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -35,8 +35,8 @@ const BoardDetailPage = () => {
     deleteCardMutation,
   } = useBoardMutations(boardId);
 
-  const [lists, setLists] = useState<Board['lists']>([]);
-  const [localCards, setLocalCards] = useState<Record<string, Board['lists'][0]['cards']>>({});
+  // 使用自訂 hook 管理 lists 與 localCards 狀態
+  const { lists, setLists, localCards, setLocalCards } = useBoardListsState(board);
 
   const { handleDragStart, handleDragOver, handleDragEnd } = useBoardDnD({
     lists,
@@ -47,17 +47,6 @@ const BoardDetailPage = () => {
     moveCard,
     invalidateBoard: () => queryClient.invalidateQueries({ queryKey: ['board', boardId] }),
   });
-
-  useEffect(() => {
-    if (board) {
-      setLists(board.lists);
-      const cardsMap: Record<string, Board['lists'][0]['cards']> = {};
-      board.lists.forEach((l) => {
-        cardsMap[l.id] = l.cards;
-      });
-      setLocalCards(cardsMap);
-    }
-  }, [board]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

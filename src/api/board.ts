@@ -154,10 +154,15 @@ export const createList = async (boardId: string, name: string) => {
   return res.data.data.createList;
 };
 
-export const createCard = async (listId: string, title: string, content: string) => {
+export const createCard = async (
+  boardId: string,
+  listId: string,
+  title: string,
+  content: string
+) => {
   const res = await apiClient.post('/graphql/query', {
     query: CREATE_CARD_MUTATION,
-    variables: { input: { listId, title, content } },
+    variables: { input: { boardId, listId, title, content } },
   });
   return res.data.data.createCard;
 };

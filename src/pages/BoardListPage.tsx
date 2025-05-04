@@ -31,7 +31,23 @@ const BoardListPage = () => {
 
   const updateBoardMutation = useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) => updateBoard(id, name),
-    onSuccess: () => {
+    // 樂觀更新
+    onMutate: async ({ id, name }) => {
+      await queryClient.cancelQueries({ queryKey: ['boards'] });
+      const previousBoards = queryClient.getQueryData<Board[]>(['boards']);
+      if (previousBoards) {
+        queryClient.setQueryData<Board[]>(['boards'],
+          previousBoards.map((b) => b.id === id ? { ...b, name } : b)
+        );
+      }
+      return { previousBoards };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousBoards) {
+        queryClient.setQueryData(['boards'], context.previousBoards);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });

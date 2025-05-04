@@ -36,8 +36,9 @@ const BoardListPage = () => {
       await queryClient.cancelQueries({ queryKey: ['boards'] });
       const previousBoards = queryClient.getQueryData<Board[]>(['boards']);
       if (previousBoards) {
-        queryClient.setQueryData<Board[]>(['boards'],
-          previousBoards.map((b) => b.id === id ? { ...b, name } : b)
+        queryClient.setQueryData<Board[]>(
+          ['boards'],
+          previousBoards.map((b) => (b.id === id ? { ...b, name } : b))
         );
       }
       return { previousBoards };

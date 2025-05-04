@@ -27,9 +27,8 @@ const BoardListPage = () => {
   const createBoardMutation = useMutation({
     mutationFn: ({ name }: { name: string; position?: number }) => {
       const boardsData = queryClient.getQueryData<Board[]>(['boards']) || [];
-      const nextPosition = boardsData.length > 0
-        ? Math.max(...boardsData.map((b) => b.position)) + 1
-        : 1;
+      const nextPosition =
+        boardsData.length > 0 ? Math.max(...boardsData.map((b) => b.position)) + 1 : 1;
       return createBoard(name, nextPosition);
     },
     onSuccess: () => {

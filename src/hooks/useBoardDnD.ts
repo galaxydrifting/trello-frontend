@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core';
 import { Board } from '../components/board/types';
@@ -24,6 +24,17 @@ export function useBoardDnD({
 }: UseBoardDnDProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeContainer, setActiveContainer] = useState<string | null>(null);
+
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const DEBOUNCE_DELAY = 5000; // ms
+
+  // debounce invalidateBoard，拖拉結束後延遲觸發
+  const debounceInvalidate = () => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      invalidateBoard();
+    }, DEBOUNCE_DELAY);
+  };
 
   const findContainer = (id?: string) => {
     if (!id) return null;
@@ -77,7 +88,7 @@ export function useBoardDnD({
         const newLists = arrayMove(lists, oldIndex, newIndex);
         setLists(newLists); // 樂觀更新 lists
         await moveList(active.id as string, newIndex);
-        invalidateBoard();
+        debounceInvalidate();
       }
     } else {
       // Move card between lists or within the same list
@@ -109,7 +120,7 @@ export function useBoardDnD({
         }
         // 強制呼叫 moveCard API
         await moveCard(active.id as string, destination, newIdx);
-        invalidateBoard();
+        debounceInvalidate();
       }
     }
     setActiveId(null);

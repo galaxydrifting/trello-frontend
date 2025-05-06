@@ -73,20 +73,35 @@ export function useBoardDnD({
     if (lists.find((l) => l.id === active.id) && lists.find((l) => l.id === over.id)) {
       const oldIndex = lists.findIndex((l) => l.id === active.id);
       const newIndex = lists.findIndex((l) => l.id === over.id);
-      const newLists = arrayMove(lists, oldIndex, newIndex);
-      setLists(newLists);
-      await moveList(active.id as string, newIndex);
-      invalidateBoard();
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+        const newLists = arrayMove(lists, oldIndex, newIndex);
+        setLists(newLists); // 樂觀更新 lists
+        await moveList(active.id as string, newIndex);
+        invalidateBoard();
+      }
     } else {
-      // Move card between lists
+      // Move card between lists or within the same list
       const source = findContainer(active.id as string);
       const destination = findContainer(over.id as string);
       if (source && destination) {
-        const srcCards = localCards[source];
-        const destCards = localCards[destination];
+        const srcCards = localCards[source] || [];
+        const destCards = localCards[destination] || [];
         const oldIdx = srcCards.findIndex((c) => c.id === active.id);
-        const newIdx = destCards.findIndex((c) => c.id === over.id);
-        if (oldIdx !== -1 && newIdx !== -1) {
+        let newIdx = destCards.findIndex((c) => c.id === over.id);
+        if (newIdx === -1) newIdx = destCards.length;
+        if (oldIdx !== -1 && (source !== destination || oldIdx !== newIdx)) {
+          // 樂觀更新 localCards，確保卡片不重複
+          const newSrcCards = [...srcCards];
+          let newDestCards = [...destCards];
+          const [movedCard] = newSrcCards.splice(oldIdx, 1);
+          // 避免目標清單已有同 id 卡片
+          newDestCards = newDestCards.filter((c) => c.id !== movedCard.id);
+          newDestCards.splice(newIdx, 0, movedCard);
+          setLocalCards({
+            ...localCards,
+            [source]: newSrcCards,
+            [destination]: newDestCards,
+          });
           await moveCard(active.id as string, destination, newIdx);
           invalidateBoard();
         }

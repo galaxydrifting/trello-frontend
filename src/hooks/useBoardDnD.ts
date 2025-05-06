@@ -89,7 +89,11 @@ export function useBoardDnD({
         const oldIdx = srcCards.findIndex((c) => c.id === active.id);
         let newIdx = destCards.findIndex((c) => c.id === over.id);
         if (newIdx === -1) newIdx = destCards.length;
-        if (oldIdx !== -1 && (source !== destination || oldIdx !== newIdx)) {
+        // 無論是否真的移動，都強制呼叫 moveCard 以確保同步
+        if (
+          oldIdx !== -1 &&
+          (source !== destination || oldIdx !== newIdx || active.id !== over.id)
+        ) {
           // 樂觀更新 localCards，確保卡片不重複
           const newSrcCards = [...srcCards];
           let newDestCards = [...destCards];
@@ -102,9 +106,10 @@ export function useBoardDnD({
             [source]: newSrcCards,
             [destination]: newDestCards,
           });
-          await moveCard(active.id as string, destination, newIdx);
-          invalidateBoard();
         }
+        // 強制呼叫 moveCard API
+        await moveCard(active.id as string, destination, newIdx);
+        invalidateBoard();
       }
     }
     setActiveId(null);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered } from 'react-icons/md';
 
 interface BoardCardProps {
   card: Card;
@@ -28,27 +29,30 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
     <div className="flex gap-1 mb-1">
       <button
         type="button"
-        className="px-1 border rounded"
+        className="px-1 border rounded text-lg flex items-center justify-center"
         onClick={() => editor?.chain().focus().toggleBold().run()}
         disabled={!editor}
+        aria-label="粗體"
       >
-        粗體
+        <MdFormatBold />
       </button>
       <button
         type="button"
-        className="px-1 border rounded"
+        className="px-1 border rounded text-lg flex items-center justify-center"
         onClick={() => editor?.chain().focus().toggleBulletList().run()}
         disabled={!editor}
+        aria-label="無序清單"
       >
-        • 清單
+        <MdFormatListBulleted />
       </button>
       <button
         type="button"
-        className="px-1 border rounded"
+        className="px-1 border rounded text-lg flex items-center justify-center"
         onClick={() => editor?.chain().focus().toggleOrderedList().run()}
         disabled={!editor}
+        aria-label="有序清單"
       >
-        1. 清單
+        <MdFormatListNumbered />
       </button>
     </div>
   );

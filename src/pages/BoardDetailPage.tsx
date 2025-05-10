@@ -89,9 +89,20 @@ const BoardDetailPage = () => {
                       onDeleteList={(id) => deleteListMutation.mutate(id)}
                       isEditingList={updateListMutation.isPending}
                       isDeletingList={deleteListMutation.isPending}
-                      onEditCard={(id, title, content) =>
-                        updateCardMutation.mutate({ id, title, content })
-                      }
+                      onEditCard={(id, title, content) => {
+                        // 先樂觀更新 localCards
+                        setLocalCards((prev) => {
+                          const newCards = { ...prev };
+                          for (const listId in newCards) {
+                            newCards[listId] = newCards[listId].map((c) =>
+                              c.id === id ? { ...c, title, content } : c
+                            );
+                          }
+                          return newCards;
+                        });
+                        // 再呼叫 API
+                        updateCardMutation.mutate({ id, title, content });
+                      }}
                       onDeleteCard={(id) => deleteCardMutation.mutate(id)}
                       isEditingCard={updateCardMutation.isPending}
                       isDeletingCard={deleteCardMutation.isPending}

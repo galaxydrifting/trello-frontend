@@ -86,7 +86,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
             autoFocus
           />
           {renderMenuBar()}
-          <div className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white">
+          <div className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white text-left">
             <EditorContent editor={editor} />
           </div>
           <div className="flex gap-2">
@@ -111,7 +111,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
         <>
           <div className="font-medium">{card.title}</div>
           <div
-            className="prose prose-sm text-gray-600 text-sm"
+            className="prose prose-sm text-gray-600 text-sm text-left"
             dangerouslySetInnerHTML={{ __html: card.content }}
           />
           {onEdit && (

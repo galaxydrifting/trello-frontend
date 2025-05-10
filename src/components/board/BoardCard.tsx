@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -23,6 +23,13 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
     content: card.content || '',
     editable: editMode,
   });
+
+  // 讓 editable 狀態隨 editMode 變化
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(editMode);
+    }
+  }, [editMode, editor]);
 
   // 工具列按鈕
   const renderMenuBar = () => (

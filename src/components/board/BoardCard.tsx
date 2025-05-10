@@ -26,9 +26,30 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
   // 工具列按鈕
   const renderMenuBar = () => (
     <div className="flex gap-1 mb-1">
-      <button type="button" className="px-1 border rounded" onClick={() => editor?.chain().focus().toggleBold().run()} disabled={!editor}>粗體</button>
-      <button type="button" className="px-1 border rounded" onClick={() => editor?.chain().focus().toggleBulletList().run()} disabled={!editor}>• 清單</button>
-      <button type="button" className="px-1 border rounded" onClick={() => editor?.chain().focus().toggleOrderedList().run()} disabled={!editor}>1. 清單</button>
+      <button
+        type="button"
+        className="px-1 border rounded"
+        onClick={() => editor?.chain().focus().toggleBold().run()}
+        disabled={!editor}
+      >
+        粗體
+      </button>
+      <button
+        type="button"
+        className="px-1 border rounded"
+        onClick={() => editor?.chain().focus().toggleBulletList().run()}
+        disabled={!editor}
+      >
+        • 清單
+      </button>
+      <button
+        type="button"
+        className="px-1 border rounded"
+        onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+        disabled={!editor}
+      >
+        1. 清單
+      </button>
     </div>
   );
 
@@ -78,7 +99,10 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
       ) : (
         <>
           <div className="font-medium">{card.title}</div>
-          <div className="prose prose-sm text-gray-600 text-sm" dangerouslySetInnerHTML={{ __html: card.content }} />
+          <div
+            className="prose prose-sm text-gray-600 text-sm"
+            dangerouslySetInnerHTML={{ __html: card.content }}
+          />
           {onEdit && (
             <button
               className="text-blue-600 text-xs mr-2"

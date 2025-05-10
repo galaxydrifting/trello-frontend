@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Card } from './types';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 
 interface BoardCardProps {
   card: Card;
@@ -12,8 +14,23 @@ interface BoardCardProps {
 const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardProps) => {
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState(card.title);
-  const [editContent, setEditContent] = useState(card.content);
   const [showDelete, setShowDelete] = useState(false);
+
+  // Tiptap 編輯器
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: card.content || '',
+    editable: editMode,
+  });
+
+  // 工具列按鈕
+  const renderMenuBar = () => (
+    <div className="flex gap-1 mb-1">
+      <button type="button" className="px-1 border rounded" onClick={() => editor?.chain().focus().toggleBold().run()} disabled={!editor}>粗體</button>
+      <button type="button" className="px-1 border rounded" onClick={() => editor?.chain().focus().toggleBulletList().run()} disabled={!editor}>• 清單</button>
+      <button type="button" className="px-1 border rounded" onClick={() => editor?.chain().focus().toggleOrderedList().run()} disabled={!editor}>1. 清單</button>
+    </div>
+  );
 
   return (
     <div className="bg-white border rounded p-2 shadow-sm">
@@ -22,8 +39,8 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
           className="flex flex-col gap-1"
           onSubmit={(e) => {
             e.preventDefault();
-            if (onEdit && editTitle.trim()) {
-              onEdit(card.id, editTitle.trim(), editContent.trim());
+            if (onEdit && editTitle.trim() && editor) {
+              onEdit(card.id, editTitle.trim(), editor.getHTML());
               setEditMode(false);
             }
           }}
@@ -36,12 +53,10 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
             required
             autoFocus
           />
-          <input
-            className="border rounded px-2 py-1 mb-1"
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            disabled={isEditing}
-          />
+          {renderMenuBar()}
+          <div className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white">
+            <EditorContent editor={editor} />
+          </div>
           <div className="flex gap-2">
             <button
               type="submit"
@@ -63,7 +78,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
       ) : (
         <>
           <div className="font-medium">{card.title}</div>
-          <div className="text-gray-600 text-sm">{card.content}</div>
+          <div className="prose prose-sm text-gray-600 text-sm" dangerouslySetInnerHTML={{ __html: card.content }} />
           {onEdit && (
             <button
               className="text-blue-600 text-xs mr-2"

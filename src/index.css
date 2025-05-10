@@ -69,3 +69,18 @@ button:focus-visible {
     color: #747bff;
   }
 }
+
+/* 讓 Tailwind Typography 的 prose 內容清單符號正常顯示 */
+.prose ul,
+.prose ol {
+  list-style: initial;
+  margin-left: 1.5em;
+  padding-left: 1em;
+}
+
+/* 強制 prose 內 ol 顯示數字 */
+.prose ol {
+  list-style-type: decimal !important;
+  margin-left: 1.5em;
+  padding-left: 1em;
+}

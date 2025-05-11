@@ -28,12 +28,12 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">登入您的帳號</h2>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="max-w-md w-full space-y-6 bg-white rounded-2xl shadow-xl p-8 mx-2">
+        <div className="flex flex-col items-center">
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">登入您的帳號</h2>
+          <p className="mt-2 text-center text-gray-500 text-sm">請輸入您的帳號與密碼以繼續</p>
         </div>
-
         <LoginForm loginMutation={loginMutation} />
       </div>
     </div>

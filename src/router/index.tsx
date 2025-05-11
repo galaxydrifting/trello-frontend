@@ -15,11 +15,11 @@ const router = createBrowserRouter([
       },
       {
         path: '/boards',
-        element: <BoardListPage />, // 新增 BoardListPage 路由
+        element: <BoardListPage />,
       },
       {
         path: '/boards/:boardId',
-        element: <BoardDetailPage />, // 新增 BoardDetailPage 路由
+        element: <BoardDetailPage />,
       },
     ],
   },

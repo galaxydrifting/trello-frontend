@@ -32,7 +32,6 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-6 bg-white rounded-2xl shadow-xl p-8 mx-2">
         <div className="flex flex-col items-center">
           <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">登入您的帳號</h2>
-          <p className="mt-2 text-center text-gray-500 text-sm">請輸入您的帳號與密碼以繼續</p>
         </div>
         <LoginForm loginMutation={loginMutation} />
       </div>

@@ -5,7 +5,7 @@ import AddListForm from '../components/board/AddListForm';
 import BoardListWithAddCard from '../components/board/BoardListWithAddCard';
 import SortableListItem from '../components/board/SortableListItem';
 import { fetchBoard, moveList, moveCard } from '../api/board';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, pointerWithin, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { useBoardDnD } from '../hooks/useBoardDnD';
 import { useBoardMutations } from '../hooks/useBoardMutations';
@@ -69,7 +69,7 @@ const BoardDetailPage = () => {
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={pointerWithin}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}

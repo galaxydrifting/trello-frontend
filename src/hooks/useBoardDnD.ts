@@ -48,12 +48,25 @@ export function useBoardDnD({
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const container = findContainer(active.id as string);
+    console.log('[DnD] handleDragStart', {
+      activeId: active.id,
+      container,
+      lists,
+      localCards,
+    });
     setActiveId(active.id as string);
     setActiveContainer(container);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { over } = event;
+    console.log('[DnD] handleDragOver: triggered', {
+      activeId,
+      activeContainer,
+      overId: over?.id,
+      overContainer: over ? findContainer(over.id as string) : null,
+      localCards,
+    });
     if (!over || !activeId || !activeContainer) return;
     const overId = over.id as string;
     const overContainer = findContainer(overId);
@@ -68,17 +81,34 @@ export function useBoardDnD({
       newFrom.splice(oldIndex, 1);
       const newTo = [...toCards];
       newTo.splice(newIndex, 0, fromCards[oldIndex]);
+      console.log('[DnD] handleDragOver: setLocalCards', {
+        from: activeContainer,
+        to: overContainer,
+        oldIndex,
+        newIndex,
+        newFrom,
+        newTo,
+      });
       setLocalCards({
         ...localCards,
         [activeContainer]: newFrom,
         [overContainer]: newTo,
       });
       setActiveContainer(overContainer);
+      console.log('[DnD] handleDragOver: setActiveContainer', overContainer);
     }
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
+    console.log('[DnD] handleDragEnd: triggered', {
+      activeId,
+      activeContainer,
+      eventActiveId: active.id,
+      eventOverId: over?.id,
+      lists,
+      localCards,
+    });
     if (!over) return;
     // Reorder lists
     if (lists.find((l) => l.id === active.id) && lists.find((l) => l.id === over.id)) {
@@ -86,6 +116,7 @@ export function useBoardDnD({
       const newIndex = lists.findIndex((l) => l.id === over.id);
       if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
         const newLists = arrayMove(lists, oldIndex, newIndex);
+        console.log('[DnD] handleDragEnd: setLists', { oldIndex, newIndex, newLists });
         setLists(newLists); // 樂觀更新 lists
         await moveList(active.id as string, newIndex);
         debounceInvalidate();
@@ -94,37 +125,43 @@ export function useBoardDnD({
       // Move card between lists or within the same list
       const source = findContainer(active.id as string);
       const destination = findContainer(over.id as string);
+      console.log('[DnD] handleDragEnd: card move', { source, destination });
       if (source && destination) {
         const srcCards = localCards[source] || [];
         const destCards = localCards[destination] || [];
         const oldIdx = srcCards.findIndex((c) => c.id === active.id);
         let newIdx = destCards.findIndex((c) => c.id === over.id);
         if (newIdx === -1) newIdx = destCards.length;
-        // 無論是否真的移動，都強制呼叫 moveCard 以確保同步
         if (
           oldIdx !== -1 &&
           (source !== destination || oldIdx !== newIdx || active.id !== over.id)
         ) {
-          // 樂觀更新 localCards，確保卡片不重複
           const newSrcCards = [...srcCards];
           let newDestCards = [...destCards];
           const [movedCard] = newSrcCards.splice(oldIdx, 1);
-          // 避免目標清單已有同 id 卡片
           newDestCards = newDestCards.filter((c) => c.id !== movedCard.id);
           newDestCards.splice(newIdx, 0, movedCard);
+          console.log('[DnD] handleDragEnd: setLocalCards', {
+            source,
+            destination,
+            oldIdx,
+            newIdx,
+            newSrcCards,
+            newDestCards,
+          });
           setLocalCards({
             ...localCards,
             [source]: newSrcCards,
             [destination]: newDestCards,
           });
         }
-        // 強制呼叫 moveCard API
         await moveCard(active.id as string, destination, newIdx);
         debounceInvalidate();
       }
     }
     setActiveId(null);
     setActiveContainer(null);
+    console.log('[DnD] handleDragEnd: reset activeId & activeContainer');
   };
 
   return {

@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useBoardList } from '../hooks/useBoardList';
 import BoardListItem from '../components/board/BoardListItem';
 import BoardCreateForm from '../components/board/BoardCreateForm';
+import Loading from '../components/common/Loading';
+import ErrorMessage from '../components/common/ErrorMessage';
 
 const BoardListPage = () => {
   const navigate = useNavigate();
@@ -23,8 +25,8 @@ const BoardListPage = () => {
     createBoardMutation.mutate({ name: newBoardName.trim() });
   };
 
-  if (isLoading) return <div>載入中...</div>;
-  if (isError) return <div>無法取得看板列表</div>;
+  if (isLoading) return <Loading />;
+  if (isError) return <ErrorMessage message="無法取得看板列表" />;
 
   return (
     <div className="p-4">

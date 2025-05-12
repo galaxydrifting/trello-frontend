@@ -21,7 +21,6 @@ const BoardListPage = () => {
   const handleCreateBoard = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBoardName.trim()) return;
-    // 計算最大 position + 1 由 hook 處理
     createBoardMutation.mutate({ name: newBoardName.trim() });
   };
 

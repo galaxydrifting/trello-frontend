@@ -27,8 +27,42 @@ export function useBoardList() {
         boardsData.length > 0 ? Math.max(...boardsData.map((b) => b.position)) + 1 : 1;
       return createBoard(name, nextPosition);
     },
-    onSuccess: () => {
+    // 樂觀更新
+    onMutate: async ({ name }) => {
+      await queryClient.cancelQueries({ queryKey: ['boards'] });
+      const previousBoards = queryClient.getQueryData<Board[]>(['boards']) || [];
+      // 產生暫時 id
+      const tempId = `temp-${Date.now()}`;
+      const boardsWithOptimistic = [
+        ...previousBoards,
+        {
+          id: tempId,
+          name,
+          position:
+            previousBoards.length > 0 ? Math.max(...previousBoards.map((b) => b.position)) + 1 : 1,
+          lists: [],
+        },
+      ];
+      queryClient.setQueryData<Board[]>(['boards'], boardsWithOptimistic);
       setNewBoardName('');
+      return { previousBoards, tempId };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousBoards) {
+        queryClient.setQueryData(['boards'], context.previousBoards);
+      }
+    },
+    onSuccess: (data, _variables, context) => {
+      // 用 API 回傳的資料取代暫時資料
+      if (context?.tempId) {
+        const boards = queryClient.getQueryData<Board[]>(['boards']) || [];
+        queryClient.setQueryData<Board[]>(
+          ['boards'],
+          boards.map((b) => (b.id === context.tempId ? data : b))
+        );
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });

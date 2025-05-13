@@ -14,6 +14,10 @@ interface BoardListWithAddCardProps {
   onDeleteCard?: (id: string) => void;
   isEditingCard?: boolean;
   isDeletingCard?: boolean;
+  isListEditing?: boolean;
+  setIsListEditing?: (v: boolean) => void;
+  editingCardId?: string | null;
+  setEditingCardId?: (id: string | null) => void;
 }
 
 const BoardListWithAddCard = ({
@@ -28,12 +32,20 @@ const BoardListWithAddCard = ({
   onDeleteCard,
   isEditingCard,
   isDeletingCard,
+  isListEditing,
+  setIsListEditing,
+  editingCardId,
+  setEditingCardId,
 }: BoardListWithAddCardProps) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  // 新增：集中管理清單與卡片編輯狀態
+  const [isListEditingState, setIsListEditingState] = useState(false);
+  const [editingCardIdState, setEditingCardIdState] = useState<string | null>(null);
 
   return (
     <div className="min-w-[260px]">
+      {/* 傳遞編輯狀態與 setter */}
       <BoardList
         list={list}
         onEdit={onEditList}
@@ -44,6 +56,12 @@ const BoardListWithAddCard = ({
         onDeleteCard={onDeleteCard}
         isEditingCard={isEditingCard}
         isDeletingCard={isDeletingCard}
+        isListEditing={isListEditing ?? isListEditingState}
+        setIsListEditing={setIsListEditing ?? setIsListEditingState}
+        editingCardId={editingCardId ?? editingCardIdState}
+        setEditingCardId={setEditingCardId ?? setEditingCardIdState}
+        // 新增：編輯清單名稱時，卡片拖拉禁用
+        disableCardDrag={!!(isListEditing ?? isListEditingState)}
       />
       <form
         className="mt-2 flex flex-col gap-1 bg-gray-50 rounded p-2"

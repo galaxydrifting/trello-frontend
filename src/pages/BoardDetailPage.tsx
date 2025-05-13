@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Board } from '../components/board/types';
 import AddListForm from '../components/board/AddListForm';
 import BoardListWithAddCard from '../components/board/BoardListWithAddCard';
@@ -54,6 +55,13 @@ const BoardDetailPage = () => {
     })
   );
 
+  // 集中管理所有清單與卡片的編輯狀態
+  const [editingListId, setEditingListId] = useState<string | null>(null);
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+
+  // 只允許同時一個清單或一張卡片進入編輯模式
+  const canEdit = !editingListId && !editingCardId;
+
   if (isLoading) return <div>載入中...</div>;
   if (isError || !board) return <div>無法取得看板資料</div>;
 
@@ -77,7 +85,11 @@ const BoardDetailPage = () => {
           <SortableContext items={lists.map((l) => l.id)} strategy={horizontalListSortingStrategy}>
             <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
               {lists.map((list) => (
-                <SortableListItem key={list.id} id={list.id}>
+                <SortableListItem
+                  key={list.id}
+                  id={list.id}
+                  disabled={editingListId === list.id || !!editingCardId}
+                >
                   <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
                     <BoardListWithAddCard
                       list={{ ...list, cards: localCards[list.id] || list.cards }}
@@ -90,7 +102,6 @@ const BoardDetailPage = () => {
                       isEditingList={updateListMutation.isPending}
                       isDeletingList={deleteListMutation.isPending}
                       onEditCard={(id, title, content) => {
-                        // 先樂觀更新 localCards
                         setLocalCards((prev) => {
                           const newCards = { ...prev };
                           for (const listId in newCards) {
@@ -100,12 +111,21 @@ const BoardDetailPage = () => {
                           }
                           return newCards;
                         });
-                        // 再呼叫 API
                         updateCardMutation.mutate({ id, title, content });
                       }}
                       onDeleteCard={(id) => deleteCardMutation.mutate(id)}
                       isEditingCard={updateCardMutation.isPending}
                       isDeletingCard={deleteCardMutation.isPending}
+                      isListEditing={editingListId === list.id}
+                      setIsListEditing={(v: boolean) => {
+                        if (v && canEdit) setEditingListId(list.id);
+                        if (!v) setEditingListId(null);
+                      }}
+                      editingCardId={editingCardId}
+                      setEditingCardId={(id) => {
+                        if (id && canEdit) setEditingCardId(id);
+                        if (!id) setEditingCardId(null);
+                      }}
                     />
                   </SortableContext>
                 </SortableListItem>

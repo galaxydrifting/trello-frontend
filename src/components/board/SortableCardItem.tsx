@@ -5,9 +5,10 @@ import React from 'react';
 interface Props {
   id: string;
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
-const SortableCardItem = ({ id, children }: Props) => {
+const SortableCardItem = ({ id, children, disabled }: Props) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
@@ -18,7 +19,7 @@ const SortableCardItem = ({ id, children }: Props) => {
     zIndex: isDragging ? 100 : 'auto',
   };
   return (
-    <li ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <li ref={setNodeRef} style={style} {...attributes} {...(disabled ? {} : listeners)}>
       {children}
     </li>
   );

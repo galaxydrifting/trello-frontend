@@ -10,10 +10,19 @@ interface BoardCardProps {
   onDelete?: (id: string) => void;
   isEditing?: boolean;
   isDeleting?: boolean;
+  editMode?: boolean;
+  setEditMode?: (v: boolean) => void;
 }
 
-const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardProps) => {
-  const [editMode, setEditMode] = useState(false);
+const BoardCard = ({
+  card,
+  onEdit,
+  onDelete,
+  isEditing,
+  isDeleting,
+  editMode = false,
+  setEditMode,
+}: BoardCardProps) => {
   const [editTitle, setEditTitle] = useState(card.title);
   const [showDelete, setShowDelete] = useState(false);
 
@@ -73,7 +82,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
             e.preventDefault();
             if (onEdit && editTitle.trim() && editor) {
               onEdit(card.id, editTitle.trim(), editor.getHTML());
-              setEditMode(false);
+              if (setEditMode) setEditMode(false);
             }
           }}
         >
@@ -100,7 +109,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
             <button
               type="button"
               className="px-2 py-1"
-              onClick={() => setEditMode(false)}
+              onClick={() => setEditMode && setEditMode(false)}
               disabled={isEditing}
             >
               取消
@@ -117,7 +126,7 @@ const BoardCard = ({ card, onEdit, onDelete, isEditing, isDeleting }: BoardCardP
           {onEdit && (
             <button
               className="text-blue-600 text-xs mr-2"
-              onClick={() => setEditMode(true)}
+              onClick={() => setEditMode && setEditMode(true)}
               disabled={isEditing}
             >
               編輯

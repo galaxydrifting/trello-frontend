@@ -13,6 +13,11 @@ interface BoardListProps {
   onDeleteCard?: (id: string) => void;
   isEditingCard?: boolean;
   isDeletingCard?: boolean;
+  isListEditing?: boolean;
+  setIsListEditing?: (v: boolean) => void;
+  editingCardId?: string | null;
+  setEditingCardId?: (id: string | null) => void;
+  disableCardDrag?: boolean;
 }
 
 const BoardList = ({
@@ -25,10 +30,17 @@ const BoardList = ({
   onDeleteCard,
   isEditingCard,
   isDeletingCard,
+  isListEditing,
+  setIsListEditing,
+  editingCardId,
+  setEditingCardId,
+  disableCardDrag = false,
 }: BoardListProps) => {
-  const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState(list.name);
   const [showDelete, setShowDelete] = useState(false);
+
+  const editMode = !!isListEditing;
+  const setEditMode = setIsListEditing || (() => {});
 
   return (
     <div className="bg-white rounded shadow p-4 min-w-[260px]">
@@ -93,13 +105,21 @@ const BoardList = ({
         ) : (
           <ul className="space-y-2">
             {list.cards.map((card) => (
-              <SortableCardItem key={card.id} id={card.id}>
+              <SortableCardItem
+                key={card.id}
+                id={card.id}
+                disabled={disableCardDrag || !!editingCardId}
+              >
                 <BoardCard
                   card={card}
                   onEdit={onEditCard}
                   onDelete={onDeleteCard}
                   isEditing={isEditingCard}
                   isDeleting={isDeletingCard}
+                  editMode={editingCardId === card.id}
+                  setEditMode={(v: boolean) =>
+                    setEditingCardId && setEditingCardId(v ? card.id : null)
+                  }
                 />
               </SortableCardItem>
             ))}

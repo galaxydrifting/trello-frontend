@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -25,6 +25,7 @@ const BoardCard = ({
 }: BoardCardProps) => {
   const [editTitle, setEditTitle] = useState(card.title);
   const [showDelete, setShowDelete] = useState(false);
+  const [isBlurring, setIsBlurring] = useState(false); // 防止重複觸發
 
   // Tiptap 編輯器
   const editor = useEditor({
@@ -73,19 +74,34 @@ const BoardCard = ({
     </div>
   );
 
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // 失焦時自動儲存（只要焦點離開整個卡片區塊就儲存）
+  const handleCardBlur = async (e: React.FocusEvent<HTMLDivElement>) => {
+    // relatedTarget 是即將獲得焦點的元素
+    if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
+      if (!isBlurring) {
+        setIsBlurring(true);
+        if (onEdit && editTitle.trim() && editor) {
+          await onEdit(card.id, editTitle.trim(), editor.getHTML());
+        }
+        setIsBlurring(false);
+        if (setEditMode) setEditMode(false);
+      }
+    }
+  };
+
   return (
-    <div className="bg-white border rounded p-2 shadow-sm">
+    <div
+      ref={cardRef}
+      className="bg-white border rounded p-2 shadow-sm"
+      onDoubleClick={() => !editMode && setEditMode && setEditMode(true)}
+      tabIndex={editMode ? 0 : -1}
+      style={{ cursor: editMode ? 'auto' : 'pointer' }}
+      onBlur={editMode ? handleCardBlur : undefined}
+    >
       {editMode ? (
-        <form
-          className="flex flex-col gap-1"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (onEdit && editTitle.trim() && editor) {
-              onEdit(card.id, editTitle.trim(), editor.getHTML());
-              if (setEditMode) setEditMode(false);
-            }
-          }}
-        >
+        <div className="flex flex-col gap-1">
           <input
             className="border rounded px-2 py-1 mb-1"
             value={editTitle}
@@ -95,53 +111,31 @@ const BoardCard = ({
             autoFocus
           />
           {renderMenuBar()}
-          <div className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white text-left">
+          <div
+            className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white text-left"
+            tabIndex={0}
+          >
             <EditorContent editor={editor} />
           </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-2 py-1 rounded"
-              disabled={isEditing || !editTitle.trim()}
-            >
-              儲存
-            </button>
+          <div className="flex gap-2 mt-1">
             <button
               type="button"
-              className="px-2 py-1"
-              onClick={() => setEditMode && setEditMode(false)}
-              disabled={isEditing}
-            >
-              取消
-            </button>
-          </div>
-        </form>
-      ) : (
-        <>
-          <div className="font-medium">{card.title}</div>
-          <div
-            className="prose prose-sm text-gray-600 text-sm text-left"
-            dangerouslySetInnerHTML={{ __html: card.content }}
-          />
-          {onEdit && (
-            <button
-              className="text-blue-600 text-xs mr-2"
-              onClick={() => setEditMode && setEditMode(true)}
-              disabled={isEditing}
-            >
-              編輯
-            </button>
-          )}
-          {onDelete && (
-            <button
               className="text-red-600 text-xs"
               onClick={() => setShowDelete(true)}
               disabled={isDeleting}
             >
               刪除
             </button>
-          )}
-        </>
+          </div>
+        </div>
+      ) : (
+        <div onDoubleClick={() => setEditMode && setEditMode(true)} className="select-none">
+          <div className="font-medium">{card.title}</div>
+          <div
+            className="prose prose-sm text-gray-600 text-sm text-left"
+            dangerouslySetInnerHTML={{ __html: card.content }}
+          />
+        </div>
       )}
       {showDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">

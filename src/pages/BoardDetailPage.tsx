@@ -77,6 +77,36 @@ const BoardDetailPage = () => {
     });
   };
 
+  // 新增卡片（樂觀更新）
+  const handleAddCard = (listId: string, title: string, content: string) => {
+    const tempId = 'temp-' + uuidv4();
+    const optimisticCard = { id: tempId, title, content };
+    setLocalCards((prev) => {
+      const newCards = { ...prev };
+      newCards[listId] = [...(newCards[listId] || []), optimisticCard];
+      return newCards;
+    });
+    createCardMutation.mutate(
+      { listId, title, content },
+      {
+        onSuccess: (data) => {
+          setLocalCards((prev) => {
+            const newCards = { ...prev };
+            newCards[listId] = (newCards[listId] || []).map((c) => (c.id === tempId ? data : c));
+            return newCards;
+          });
+        },
+        onError: () => {
+          setLocalCards((prev) => {
+            const newCards = { ...prev };
+            newCards[listId] = (newCards[listId] || []).filter((c) => c.id !== tempId);
+            return newCards;
+          });
+        },
+      }
+    );
+  };
+
   if (isLoading) return <div>載入中...</div>;
   if (isError || !board) return <div>無法取得看板資料</div>;
 
@@ -105,9 +135,7 @@ const BoardDetailPage = () => {
                   <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
                     <BoardListWithAddCard
                       list={{ ...list, cards: localCards[list.id] || list.cards }}
-                      onAddCard={(listId, title, content) =>
-                        createCardMutation.mutate({ listId, title, content })
-                      }
+                      onAddCard={handleAddCard}
                       isPending={createCardMutation.isPending}
                       onEditList={(id, name) => updateListMutation.mutate({ id, name })}
                       onDeleteList={(id) => deleteListMutation.mutate(id)}

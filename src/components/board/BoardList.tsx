@@ -18,6 +18,8 @@ interface BoardListProps {
   editingCardId?: string | null;
   setEditingCardId?: (id: string | null) => void;
   disableCardDrag?: boolean;
+  // 新增卡片
+  onAddCard?: (listId: string) => void;
 }
 
 const BoardList = ({
@@ -35,6 +37,7 @@ const BoardList = ({
   editingCardId,
   setEditingCardId,
   disableCardDrag = false,
+  onAddCard,
 }: BoardListProps) => {
   const [editName, setEditName] = useState(list.name);
   const [showDelete, setShowDelete] = useState(false);
@@ -75,25 +78,48 @@ const BoardList = ({
     >
       {/* 刪除按鈕，右上角，僅 hover 且非編輯狀態下顯示 */}
       {!editMode && (
-        <button
-          className="absolute top-2 right-2 text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none hidden group-hover:block"
-          style={{ boxShadow: 'none', border: 'none' }}
-          onClick={() => setShowDelete(true)}
-          disabled={isDeleting}
-          title="刪除清單"
-          aria-label="刪除清單"
-        >
-          <svg
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
+        <>
+          <button
+            className="absolute top-2 right-2 text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none hidden group-hover:block"
+            style={{ boxShadow: 'none', border: 'none' }}
+            onClick={() => setShowDelete(true)}
+            disabled={isDeleting}
+            title="刪除清單"
+            aria-label="刪除清單"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          {/* 新增卡片按鈕，僅 hover 顯示 */}
+          {onAddCard && (
+            <button
+              className="absolute top-2 right-10 text-gray-400 hover:text-green-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none hidden group-hover:block"
+              style={{ boxShadow: 'none', border: 'none' }}
+              onClick={() => onAddCard(list.id)}
+              title="新增卡片"
+              aria-label="新增卡片"
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          )}
+        </>
       )}
       {editMode ? (
         <form

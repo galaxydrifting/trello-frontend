@@ -156,7 +156,7 @@ const BoardList = ({
         )}
       </div>
       {showDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center z-50 transition-colors">
           <div className="bg-white p-4 rounded shadow">
             <div className="mb-2">確定要刪除「{list.name}」嗎？</div>
             <div className="flex gap-2 justify-end">

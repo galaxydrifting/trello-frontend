@@ -75,7 +75,7 @@ const BoardCard = ({
       </div>
       <button
         type="button"
-        className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none"
+        className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
         style={{ boxShadow: 'none', border: 'none' }}
         onClick={async () => {
           if (onDelete) await onDelete(card.id);

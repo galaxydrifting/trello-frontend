@@ -80,8 +80,9 @@ const BoardList = ({
       {!editMode && (
         <>
           <button
-            className="absolute top-2 right-2 text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none hidden group-hover:block"
-            style={{ boxShadow: 'none', border: 'none' }}
+            className="absolute top-2 right-2 text-gray-400 hover:text-red-600 transition-colors p-1 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none hidden group-hover:block"
+            tabIndex={0}
+            style={{ boxShadow: 'none', border: 'none', outline: 'none' }}
             onClick={() => setShowDelete(true)}
             disabled={isDeleting}
             title="刪除清單"
@@ -101,8 +102,9 @@ const BoardList = ({
           {/* 新增卡片按鈕，僅 hover 顯示 */}
           {onAddCard && (
             <button
-              className="absolute top-2 right-10 text-gray-400 hover:text-green-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none hidden group-hover:block"
-              style={{ boxShadow: 'none', border: 'none' }}
+              className="absolute top-2 right-10 text-gray-400 hover:text-green-600 transition-colors p-1 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none hidden group-hover:block"
+              tabIndex={0}
+              style={{ boxShadow: 'none', border: 'none', outline: 'none' }}
               onClick={() => onAddCard(list.id)}
               title="新增卡片"
               aria-label="新增卡片"

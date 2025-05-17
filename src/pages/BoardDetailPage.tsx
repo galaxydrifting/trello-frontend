@@ -83,7 +83,7 @@ const BoardDetailPage = () => {
     const optimisticCard = { id: tempId, title, content };
     setLocalCards((prev) => {
       const newCards = { ...prev };
-      newCards[listId] = [...(newCards[listId] || []), optimisticCard];
+      newCards[listId] = [optimisticCard, ...(newCards[listId] || [])]; // 插入最前面
       return newCards;
     });
     createCardMutation.mutate(

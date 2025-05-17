@@ -11,6 +11,7 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { useBoardDnD } from '../hooks/useBoardDnD';
 import { useBoardMutations } from '../hooks/useBoardMutations';
 import { useBoardListsState } from '../hooks/useBoardListsState';
+import { v4 as uuidv4 } from 'uuid';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -62,6 +63,22 @@ const BoardDetailPage = () => {
   // 只允許同時一個清單或一張卡片進入編輯模式
   const canEdit = !editingListId && !editingCardId;
 
+  const handleAddList = (name: string) => {
+    const tempId = 'temp-' + uuidv4();
+    const optimisticList = { id: tempId, name, cards: [] };
+    setLists((prev) => [...prev, optimisticList]);
+    createListMutation.mutate(name, {
+      onSuccess: (data) => {
+        setLists((prev) =>
+          prev.map((l) => (l.id === tempId ? data : l))
+        );
+      },
+      onError: () => {
+        setLists((prev) => prev.filter((l) => l.id !== tempId));
+      },
+    });
+  };
+
   if (isLoading) return <div>載入中...</div>;
   if (isError || !board) return <div>無法取得看板資料</div>;
 
@@ -69,7 +86,7 @@ const BoardDetailPage = () => {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
       <AddListForm
-        onAdd={(name) => createListMutation.mutate(name)}
+        onAdd={handleAddList}
         isPending={createListMutation.isPending}
       />
       {lists.length === 0 ? (

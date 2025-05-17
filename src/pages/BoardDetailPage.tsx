@@ -107,6 +107,39 @@ const BoardDetailPage = () => {
     );
   };
 
+  // 刪除卡片（樂觀更新）
+  const handleDeleteCard = (listId: string, cardId: string) => {
+    // 樂觀移除
+    setLocalCards((prev) => {
+      const newCards = { ...prev };
+      newCards[listId] = (newCards[listId] || []).filter((c) => c.id !== cardId);
+      return newCards;
+    });
+    deleteCardMutation.mutate(cardId, {
+      onError: () => {
+        // 若失敗，重新加回卡片（可根據需求調整，這裡簡單 reload）
+        queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+      },
+    });
+  };
+
+  // 刪除清單（樂觀更新）
+  const handleDeleteList = (listId: string) => {
+    // 樂觀移除
+    setLists((prev) => prev.filter((l) => l.id !== listId));
+    setLocalCards((prev) => {
+      const newCards = { ...prev };
+      delete newCards[listId];
+      return newCards;
+    });
+    deleteListMutation.mutate(listId, {
+      onError: () => {
+        // 若失敗，重新加回清單（可根據需求調整，這裡簡單 reload）
+        queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+      },
+    });
+  };
+
   if (isLoading) return <div>載入中...</div>;
   if (isError || !board) return <div>無法取得看板資料</div>;
 
@@ -138,7 +171,7 @@ const BoardDetailPage = () => {
                       onAddCard={handleAddCard}
                       isPending={createCardMutation.isPending}
                       onEditList={(id, name) => updateListMutation.mutate({ id, name })}
-                      onDeleteList={(id) => deleteListMutation.mutate(id)}
+                      onDeleteList={handleDeleteList}
                       isEditingList={updateListMutation.isPending}
                       isDeletingList={deleteListMutation.isPending}
                       onEditCard={(id, title, content) => {
@@ -153,7 +186,7 @@ const BoardDetailPage = () => {
                         });
                         updateCardMutation.mutate({ id, title, content });
                       }}
-                      onDeleteCard={(id) => deleteCardMutation.mutate(id)}
+                      onDeleteCard={(id) => handleDeleteCard(list.id, id)}
                       isEditingCard={updateCardMutation.isPending}
                       isDeletingCard={deleteCardMutation.isPending}
                       isListEditing={editingListId === list.id}

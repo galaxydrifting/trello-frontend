@@ -110,7 +110,13 @@ const BoardCard = ({
   return (
     <div
       ref={cardRef}
-      className="bg-white border rounded p-2 shadow-sm"
+      className={`bg-white rounded-xl min-h-[60px] p-2 transition-all duration-200 
+        ${
+          editMode
+            ? 'border-2 border-blue-400 shadow-lg ring-2 ring-blue-100'
+            : 'border border-gray-200 shadow-md'
+        }
+      `}
       onDoubleClick={() => !editMode && setEditMode && setEditMode(true)}
       tabIndex={editMode ? 0 : -1}
       style={{ cursor: editMode ? 'auto' : 'pointer' }}

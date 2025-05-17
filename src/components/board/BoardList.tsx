@@ -64,7 +64,15 @@ const BoardList = ({
   }, [list.name]);
 
   return (
-    <div className="bg-white rounded shadow p-4 min-w-[260px] relative group">
+    <div
+      className={`bg-white rounded-xl min-w-[260px] p-4 relative group transition-all duration-200 
+        ${
+          editMode
+            ? 'border-2 border-blue-400 shadow-lg ring-2 ring-blue-100'
+            : 'border border-gray-200 shadow-md'
+        }
+      `}
+    >
       {/* 刪除按鈕，右上角，僅 hover 且非編輯狀態下顯示 */}
       {!editMode && (
         <button

@@ -69,9 +69,7 @@ const BoardDetailPage = () => {
     setLists((prev) => [...prev, optimisticList]);
     createListMutation.mutate(name, {
       onSuccess: (data) => {
-        setLists((prev) =>
-          prev.map((l) => (l.id === tempId ? data : l))
-        );
+        setLists((prev) => prev.map((l) => (l.id === tempId ? data : l)));
       },
       onError: () => {
         setLists((prev) => prev.filter((l) => l.id !== tempId));
@@ -85,10 +83,7 @@ const BoardDetailPage = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
-      <AddListForm
-        onAdd={handleAddList}
-        isPending={createListMutation.isPending}
-      />
+      <AddListForm onAdd={handleAddList} isPending={createListMutation.isPending} />
       {lists.length === 0 ? (
         <div className="text-gray-400 text-center py-8">尚無清單</div>
       ) : (

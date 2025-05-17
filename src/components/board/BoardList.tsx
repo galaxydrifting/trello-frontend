@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SortableCardItem from './SortableCardItem';
 import { List } from './types';
 import BoardCard from './BoardCard';
@@ -38,65 +38,84 @@ const BoardList = ({
 }: BoardListProps) => {
   const [editName, setEditName] = useState(list.name);
   const [showDelete, setShowDelete] = useState(false);
-
   const editMode = !!isListEditing;
   const setEditMode = setIsListEditing || (() => {});
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editMode && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editMode]);
+
+  // 失焦時自動儲存
+  const handleBlur = () => {
+    if (onEdit && editName.trim() && editName !== list.name) {
+      setEditName(editName.trim()); // 立即本地更新
+      onEdit(list.id, editName.trim());
+    }
+    setEditMode(false);
+  };
+
+  // 樂觀更新：本地先顯示新名稱
+  useEffect(() => {
+    setEditName(list.name);
+  }, [list.name]);
 
   return (
-    <div className="bg-white rounded shadow p-4 min-w-[260px]">
+    <div className="bg-white rounded shadow p-4 min-w-[260px] relative group">
+      {/* 刪除按鈕，右上角，僅 hover 顯示 */}
+      <button
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus:outline-none border-none shadow-none hidden group-hover:block"
+        style={{ boxShadow: 'none', border: 'none' }}
+        onClick={() => setShowDelete(true)}
+        disabled={isDeleting}
+        title="刪除清單"
+        aria-label="刪除清單"
+      >
+        <svg
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
       {editMode ? (
         <form
           className="flex gap-2 mb-2"
           onSubmit={(e) => {
             e.preventDefault();
-            if (onEdit && editName.trim()) {
+            if (onEdit && editName.trim() && editName !== list.name) {
+              setEditName(editName.trim()); // 立即本地更新
               onEdit(list.id, editName.trim());
-              setEditMode(false);
             }
+            setEditMode(false);
           }}
         >
           <input
+            ref={inputRef}
             className="border rounded px-2 py-1 flex-1"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
+            onBlur={handleBlur}
             disabled={isEditing}
             autoFocus
           />
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-2 py-1 rounded"
-            disabled={isEditing || !editName.trim()}
-          >
-            儲存
-          </button>
-          <button
-            type="button"
-            className="px-2 py-1"
-            onClick={() => setEditMode(false)}
-            disabled={isEditing}
-          >
-            取消
-          </button>
         </form>
       ) : (
-        <div className="flex items-center mb-2 gap-2">
-          <h2 className="font-semibold flex-1 cursor-move" onClick={() => setEditMode(true)}>
+        <div className="flex items-center mb-2 gap-2 select-none">
+          <h2
+            className="font-semibold flex-1 cursor-pointer text-lg"
+            onDoubleClick={() => setEditMode(true)}
+            title="雙擊編輯清單名稱"
+          >
             {list.name}
           </h2>
-          <button
-            className="text-blue-600 px-2 py-1"
-            onClick={() => setEditMode(true)}
-            disabled={isEditing}
-          >
-            編輯
-          </button>
-          <button
-            className="text-red-600 px-2 py-1"
-            onClick={() => setShowDelete(true)}
-            disabled={isDeleting}
-          >
-            刪除
-          </button>
         </div>
       )}
       <div className="min-h-[40px] bg-gray-50 rounded p-2">

@@ -20,6 +20,9 @@ interface BoardListProps {
   disableCardDrag?: boolean;
   // 新增卡片
   onAddCard?: (listId: string) => void;
+  // 新增
+  tempCardId?: string | null;
+  onCancelTempCard?: (id: string) => void;
 }
 
 const BoardList = ({
@@ -38,6 +41,8 @@ const BoardList = ({
   setEditingCardId,
   disableCardDrag = false,
   onAddCard,
+  tempCardId,
+  onCancelTempCard,
 }: BoardListProps) => {
   const [editName, setEditName] = useState(list.name);
   const [showDelete, setShowDelete] = useState(false);
@@ -177,6 +182,12 @@ const BoardList = ({
                   setEditMode={(v: boolean) =>
                     setEditingCardId && setEditingCardId(v ? card.id : null)
                   }
+                  {...(tempCardId === card.id
+                    ? { onCancel: () => onCancelTempCard && onCancelTempCard(card.id) }
+                    : {})}
+                  {...(tempCardId === card.id
+                    ? { titlePlaceholder: '輸入卡片標題', contentPlaceholder: '輸入卡片內容' }
+                    : {})}
                 />
               </SortableCardItem>
             ))}

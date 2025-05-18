@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered } from 'react-icons/md';
+import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered, MdCancel } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 
 interface BoardCardProps {
@@ -13,6 +13,10 @@ interface BoardCardProps {
   isDeleting?: boolean;
   editMode?: boolean;
   setEditMode?: (v: boolean) => void;
+  // 新增
+  onCancel?: () => void;
+  titlePlaceholder?: string;
+  contentPlaceholder?: string;
 }
 
 const BoardCard = ({
@@ -23,9 +27,15 @@ const BoardCard = ({
   isDeleting,
   editMode = false,
   setEditMode,
+  onCancel,
+  titlePlaceholder,
+  contentPlaceholder,
 }: BoardCardProps) => {
   const [editTitle, setEditTitle] = useState(card.title);
   const [isBlurring, setIsBlurring] = useState(false); // 防止重複觸發
+
+  // 判斷是否為暫存卡片（尚未送出到後端）
+  const isTempCard = card.id.startsWith('temp-');
 
   // Tiptap 編輯器
   const editor = useEditor({
@@ -73,20 +83,37 @@ const BoardCard = ({
           <MdFormatListNumbered />
         </button>
       </div>
-      <button
-        type="button"
-        className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
-        style={{ boxShadow: 'none', border: 'none' }}
-        onClick={async () => {
-          if (onDelete) await onDelete(card.id);
-          if (setEditMode) setEditMode(false);
-        }}
-        disabled={isDeleting}
-        title="刪除卡片"
-        aria-label="刪除卡片"
-      >
-        <FaRegTrashAlt size={20} />
-      </button>
+      {isTempCard ? (
+        <button
+          type="button"
+          className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
+          style={{ boxShadow: 'none', border: 'none' }}
+          onClick={() => {
+            if (onCancel) onCancel(); // 僅前端移除暫存卡片
+            if (setEditMode) setEditMode(false);
+          }}
+          disabled={isDeleting}
+          title="取消新增卡片"
+          aria-label="取消新增卡片"
+        >
+          <MdCancel size={22} />
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
+          style={{ boxShadow: 'none', border: 'none' }}
+          onClick={async () => {
+            if (onDelete) await onDelete(card.id);
+            if (setEditMode) setEditMode(false);
+          }}
+          disabled={isDeleting}
+          title="刪除卡片"
+          aria-label="刪除卡片"
+        >
+          <FaRegTrashAlt size={20} />
+        </button>
+      )}
     </div>
   );
 
@@ -131,11 +158,21 @@ const BoardCard = ({
             disabled={isEditing}
             required
             autoFocus
+            placeholder={titlePlaceholder}
           />
-          <div className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white text-left flex-1">
+          <div className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white text-left flex-1 relative">
             <EditorContent editor={editor} />
+            {/* 只在內容區為空時顯示 placeholder，且不影響清單外觀 */}
+            {contentPlaceholder && !editor?.getText().trim() && editMode && (
+              <div className="absolute left-3 top-2 text-gray-300 pointer-events-none select-none z-10">
+                {contentPlaceholder}
+              </div>
+            )}
           </div>
-          <div className="mt-auto pt-1">{renderMenuBar()}</div>
+          <div className="mt-auto pt-1 flex gap-2">
+            {/* 垃圾桶按鈕已存在，onDelete 可用於刪除暫存卡片 */}
+            {renderMenuBar()}
+          </div>
         </div>
       ) : (
         <div onDoubleClick={() => setEditMode && setEditMode(true)} className="select-none">

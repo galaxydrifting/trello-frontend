@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import BoardList from './BoardList';
 import { List } from './types';
 
@@ -39,15 +40,46 @@ const BoardListWithAddCard = ({
 }: BoardListWithAddCardProps) => {
   const [isListEditingState, setIsListEditingState] = useState(false);
   const [editingCardIdState, setEditingCardIdState] = useState<string | null>(null);
+  const [tempCard, setTempCard] = useState<null | { id: string; title: string; content: string }>(null);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddCardClick = () => {
+    if (isPending || isAdding) return;
+    const tempId = 'temp-' + uuidv4();
+    setTempCard({ id: tempId, title: '', content: '' });
+    setEditingCardIdState(tempId);
+    setIsAdding(true);
+  };
+
+  const handleSaveTempCard = (id: string, title: string, content: string) => {
+    if (!title.trim()) return;
+    if (tempCard && id === tempCard.id) {
+      onAddCard(list.id, title, content);
+      setTempCard(null);
+      setEditingCardIdState(null);
+      setIsAdding(false);
+    } else if (onEditCard) {
+      onEditCard(id, title, content);
+    }
+  };
+
+  const handleCancelTempCard = (id: string) => {
+    if (tempCard && id === tempCard.id) {
+      setTempCard(null);
+      setEditingCardIdState(null);
+      setIsAdding(false);
+    }
+  };
+
+  const cards = tempCard ? [tempCard, ...list.cards] : list.cards;
 
   return (
     <div className="min-w-[260px]">
-      {/* 傳遞編輯狀態與 setter */}
       <BoardList
-        list={list}
+        list={{ ...list, cards }}
         onEdit={onEditList}
         onDelete={onDeleteList}
-        onEditCard={onEditCard}
+        onEditCard={handleSaveTempCard}
         onDeleteCard={onDeleteCard}
         isEditing={isEditingList}
         isDeleting={isDeletingList}
@@ -58,9 +90,9 @@ const BoardListWithAddCard = ({
         editingCardId={editingCardId ?? editingCardIdState}
         setEditingCardId={setEditingCardId ?? setEditingCardIdState}
         disableCardDrag={!!(isListEditing ?? isListEditingState)}
-        onAddCard={(listId) => {
-          if (!isPending) onAddCard(listId, '', '');
-        }}
+        onAddCard={handleAddCardClick}
+        tempCardId={tempCard?.id}
+        onCancelTempCard={handleCancelTempCard}
       />
     </div>
   );

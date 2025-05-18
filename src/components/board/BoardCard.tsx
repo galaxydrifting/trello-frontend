@@ -168,6 +168,7 @@ const BoardCard = ({
             <EditorContent
               editor={editor}
               style={{ outline: 'none', boxShadow: 'none' }} // 移除 inline padding，統一用 CSS 控制
+              {...(editMode ? { onPointerDown: (e) => e.stopPropagation() } : {})}
             />
             {/* 只在內容區為空時顯示 placeholder，且不影響清單外觀 */}
             {contentPlaceholder && !editor?.getText().trim() && editMode && (

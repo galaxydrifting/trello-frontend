@@ -89,3 +89,9 @@ button:focus-visible {
   margin-left: 1.5em;
   padding-left: 1em;
 }
+
+/* 移除 Tiptap ProseMirror 編輯區的預設黑色 outline，統一 focus 樣式 */
+.ProseMirror:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}

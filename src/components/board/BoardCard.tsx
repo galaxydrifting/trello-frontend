@@ -152,7 +152,7 @@ const BoardCard = ({
       {editMode ? (
         <div className="flex flex-col gap-1 h-full min-h-[180px]">
           <input
-            className="border rounded px-2 py-1 mb-1"
+            className="border border-gray-300 rounded-md px-2 py-1 mb-1 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
             disabled={isEditing}
@@ -160,8 +160,12 @@ const BoardCard = ({
             autoFocus
             placeholder={titlePlaceholder}
           />
-          <div className="prose prose-sm border rounded px-2 py-1 mb-1 min-h-[80px] bg-white text-left flex-1 relative">
-            <EditorContent editor={editor} />
+          <div
+            className="prose prose-sm border border-gray-300 rounded-md px-2 py-1 mb-1 min-h-[80px] bg-white text-left flex-1 relative focus-within:ring-2 focus-within:ring-blue-200 focus-within:border-blue-400 focus-within:border-2 focus-within:outline-none focus-within:outline-0 transition"
+            tabIndex={0}
+            style={{ outline: 'none', boxShadow: 'none' }}
+          >
+            <EditorContent editor={editor} style={{ outline: 'none', boxShadow: 'none' }} />
             {/* 只在內容區為空時顯示 placeholder，且不影響清單外觀 */}
             {contentPlaceholder && !editor?.getText().trim() && editMode && (
               <div className="absolute left-3 top-2 text-gray-300 pointer-events-none select-none z-10">

@@ -95,3 +95,13 @@ button:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
+
+.ProseMirror {
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.25rem 0.5rem; /* py-1 px-2，與 input 對齊 */
+  min-height: 2.25rem; /* 與 input 高度一致 */
+  box-sizing: border-box;
+  outline: none !important;
+  background: transparent;
+}

@@ -40,7 +40,9 @@ const BoardListWithAddCard = ({
 }: BoardListWithAddCardProps) => {
   const [isListEditingState, setIsListEditingState] = useState(false);
   const [editingCardIdState, setEditingCardIdState] = useState<string | null>(null);
-  const [tempCard, setTempCard] = useState<null | { id: string; title: string; content: string }>(null);
+  const [tempCard, setTempCard] = useState<null | { id: string; title: string; content: string }>(
+    null
+  );
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddCardClick = () => {

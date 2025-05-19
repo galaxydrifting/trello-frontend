@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -53,19 +53,32 @@ const BoardCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
 
   // 失焦時自動儲存（只要焦點離開整個卡片區塊就儲存）
-  const handleCardBlur = async (e: React.FocusEvent<HTMLDivElement>) => {
-    // relatedTarget 是即將獲得焦點的元素
-    if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
-      if (!isBlurring) {
-        setIsBlurring(true);
-        if (onEdit && editTitle.trim() && editor) {
-          await onEdit(card.id, editTitle.trim(), editor.getHTML());
+  const handleCardBlur = useCallback(
+    async (e: React.FocusEvent<HTMLDivElement>) => {
+      if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
+        if (!isBlurring) {
+          setIsBlurring(true);
+          if (onEdit && editTitle.trim() && editor) {
+            await onEdit(card.id, editTitle.trim(), editor.getHTML());
+          }
+          setIsBlurring(false);
+          if (setEditMode) setEditMode(false);
         }
-        setIsBlurring(false);
-        if (setEditMode) setEditMode(false);
       }
-    }
-  };
+    },
+    [cardRef, isBlurring, onEdit, editTitle, editor, card.id, setEditMode]
+  );
+
+  // MenuBar 事件也用 useCallback 包裝
+  const handleCancel = useCallback(() => {
+    if (onCancel) onCancel();
+    if (setEditMode) setEditMode(false);
+  }, [onCancel, setEditMode]);
+
+  const handleDelete = useCallback(async () => {
+    if (onDelete) await onDelete(card.id);
+    if (setEditMode) setEditMode(false);
+  }, [onDelete, card.id, setEditMode]);
 
   return (
     <div
@@ -115,14 +128,8 @@ const BoardCard = ({
               editor={editor}
               isTempCard={isTempCard}
               isDeleting={isDeleting}
-              onCancel={() => {
-                if (onCancel) onCancel();
-                if (setEditMode) setEditMode(false);
-              }}
-              onDelete={async () => {
-                if (onDelete) await onDelete(card.id);
-                if (setEditMode) setEditMode(false);
-              }}
+              onCancel={handleCancel}
+              onDelete={handleDelete}
             />
           </div>
         </div>

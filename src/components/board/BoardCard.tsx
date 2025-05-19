@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered, MdCancel } from 'react-icons/md';
-import { FaRegTrashAlt } from 'react-icons/fa';
+import MenuBar from './MenuBar';
 
 interface BoardCardProps {
   card: Card;
@@ -50,72 +49,6 @@ const BoardCard = ({
       editor.setEditable(editMode);
     }
   }, [editMode, editor]);
-
-  // 工具列按鈕
-  const renderMenuBar = () => (
-    <div className="flex gap-1 items-center w-full justify-between">
-      <div className="flex gap-1">
-        <button
-          type="button"
-          className="px-1 border rounded text-lg flex items-center justify-center"
-          onClick={() => editor?.chain().focus().toggleBold().run()}
-          disabled={!editor}
-          aria-label="粗體"
-        >
-          <MdFormatBold />
-        </button>
-        <button
-          type="button"
-          className="px-1 border rounded text-lg flex items-center justify-center"
-          onClick={() => editor?.chain().focus().toggleBulletList().run()}
-          disabled={!editor}
-          aria-label="無序清單"
-        >
-          <MdFormatListBulleted />
-        </button>
-        <button
-          type="button"
-          className="px-1 border rounded text-lg flex items-center justify-center"
-          onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-          disabled={!editor}
-          aria-label="有序清單"
-        >
-          <MdFormatListNumbered />
-        </button>
-      </div>
-      {isTempCard ? (
-        <button
-          type="button"
-          className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
-          style={{ boxShadow: 'none', border: 'none' }}
-          onClick={() => {
-            if (onCancel) onCancel(); // 僅前端移除暫存卡片
-            if (setEditMode) setEditMode(false);
-          }}
-          disabled={isDeleting}
-          title="取消新增卡片"
-          aria-label="取消新增卡片"
-        >
-          <MdCancel size={22} />
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
-          style={{ boxShadow: 'none', border: 'none' }}
-          onClick={async () => {
-            if (onDelete) await onDelete(card.id);
-            if (setEditMode) setEditMode(false);
-          }}
-          disabled={isDeleting}
-          title="刪除卡片"
-          aria-label="刪除卡片"
-        >
-          <FaRegTrashAlt size={20} />
-        </button>
-      )}
-    </div>
-  );
 
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -178,8 +111,19 @@ const BoardCard = ({
             )}
           </div>
           <div className="mt-auto pt-1 flex gap-2">
-            {/* 垃圾桶按鈕已存在，onDelete 可用於刪除暫存卡片 */}
-            {renderMenuBar()}
+            <MenuBar
+              editor={editor}
+              isTempCard={isTempCard}
+              isDeleting={isDeleting}
+              onCancel={() => {
+                if (onCancel) onCancel();
+                if (setEditMode) setEditMode(false);
+              }}
+              onDelete={async () => {
+                if (onDelete) await onDelete(card.id);
+                if (setEditMode) setEditMode(false);
+              }}
+            />
           </div>
         </div>
       ) : (

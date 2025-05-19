@@ -8,16 +8,15 @@ interface AddListFormProps {
 const AddListForm = ({ onAdd, isPending }: AddListFormProps) => {
   const [name, setName] = useState('');
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onAdd(name.trim());
+    setName('');
+  };
+
   return (
-    <form
-      className="flex gap-2 mb-4"
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!name.trim()) return;
-        onAdd(name.trim());
-        setName('');
-      }}
-    >
+    <form className="flex gap-2 mb-4" onSubmit={handleSubmit}>
       <input
         type="text"
         className="border rounded px-2 py-1 flex-1"

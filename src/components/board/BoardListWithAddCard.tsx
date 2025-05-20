@@ -15,10 +15,6 @@ interface BoardListWithAddCardProps {
   onDeleteCard?: (id: string) => void;
   isEditingCard?: boolean;
   isDeletingCard?: boolean;
-  isListEditing?: boolean;
-  setIsListEditing?: (v: boolean) => void;
-  editingCardId?: string | null;
-  setEditingCardId?: (id: string | null) => void;
 }
 
 const BoardListWithAddCard = ({
@@ -33,13 +29,7 @@ const BoardListWithAddCard = ({
   onDeleteCard,
   isEditingCard,
   isDeletingCard,
-  isListEditing,
-  setIsListEditing,
-  editingCardId,
-  setEditingCardId,
 }: BoardListWithAddCardProps) => {
-  const [isListEditingState, setIsListEditingState] = useState(false);
-  const [editingCardIdState, setEditingCardIdState] = useState<string | null>(null);
   const [tempCard, setTempCard] = useState<null | { id: string; title: string; content: string }>(
     null
   );
@@ -49,7 +39,6 @@ const BoardListWithAddCard = ({
     if (isPending || isAdding) return;
     const tempId = 'temp-' + uuidv4();
     setTempCard({ id: tempId, title: '', content: '' });
-    setEditingCardIdState(tempId);
     setIsAdding(true);
   };
 
@@ -58,7 +47,6 @@ const BoardListWithAddCard = ({
     if (tempCard && id === tempCard.id) {
       onAddCard(list.id, title, content);
       setTempCard(null);
-      setEditingCardIdState(null);
       setIsAdding(false);
     } else if (onEditCard) {
       onEditCard(id, title, content);
@@ -68,7 +56,6 @@ const BoardListWithAddCard = ({
   const handleCancelTempCard = (id: string) => {
     if (tempCard && id === tempCard.id) {
       setTempCard(null);
-      setEditingCardIdState(null);
       setIsAdding(false);
     }
   };
@@ -87,11 +74,7 @@ const BoardListWithAddCard = ({
         isDeleting={isDeletingList}
         isEditingCard={isEditingCard}
         isDeletingCard={isDeletingCard}
-        isListEditing={isListEditing ?? isListEditingState}
-        setIsListEditing={setIsListEditing ?? setIsListEditingState}
-        editingCardId={editingCardId ?? editingCardIdState}
-        setEditingCardId={setEditingCardId ?? setEditingCardIdState}
-        disableCardDrag={!!(isListEditing ?? isListEditingState)}
+        disableCardDrag={!!isEditingList}
         onAddCard={handleAddCardClick}
         tempCardId={tempCard?.id}
         onCancelTempCard={handleCancelTempCard}

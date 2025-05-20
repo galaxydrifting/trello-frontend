@@ -3,6 +3,7 @@ import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import MenuBar from './MenuBar';
+import { useBoardEditContext } from './BoardEditContext';
 
 interface BoardCardProps {
   card: Card;
@@ -24,7 +25,7 @@ const BoardCard = ({
   onDelete,
   isEditing,
   isDeleting,
-  editMode = false,
+  editMode,
   setEditMode,
   onCancel,
   titlePlaceholder,
@@ -43,12 +44,15 @@ const BoardCard = ({
     editable: editMode,
   });
 
-  // 讓 editable 狀態隨 editMode 變化
+  // 取 context
+  const { editingCardId, setEditingCardId, canEdit } = useBoardEditContext();
+  // 讓 editable 狀態隨 editMode/context 變化
   useEffect(() => {
+    const mode = typeof editMode === 'boolean' ? editMode : editingCardId === card.id;
     if (editor) {
-      editor.setEditable(editMode);
+      editor.setEditable(mode);
     }
-  }, [editMode, editor]);
+  }, [editMode, editingCardId, card.id, editor]);
 
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -80,22 +84,32 @@ const BoardCard = ({
     if (setEditMode) setEditMode(false);
   }, [onDelete, card.id, setEditMode]);
 
+  // 若有傳入 editMode/setEditMode 則優先用 props，否則用 context
+  const effectiveEditMode = typeof editMode === 'boolean' ? editMode : editingCardId === card.id;
+  const effectiveSetEditMode = setEditMode
+    ? setEditMode
+    : (v: boolean) => {
+        if (v && canEdit) setEditingCardId(card.id);
+        if (!v) setEditingCardId(null);
+      };
+
+  // 其餘 props 只傳給 BoardCard 需要的部分，未用到的 props 不再傳遞
   return (
     <div
       ref={cardRef}
       className={`bg-white rounded-xl min-h-[60px] p-2 transition-all duration-200 
         ${
-          editMode
+          effectiveEditMode
             ? 'border-2 border-blue-400 shadow-lg ring-2 ring-blue-100'
             : 'border border-gray-200 shadow-md'
         }
       `}
-      onDoubleClick={() => !editMode && setEditMode && setEditMode(true)}
-      tabIndex={editMode ? 0 : -1}
-      style={{ cursor: editMode ? 'auto' : 'pointer' }}
-      onBlur={editMode ? handleCardBlur : undefined}
+      onDoubleClick={() => !effectiveEditMode && effectiveSetEditMode(true)}
+      tabIndex={effectiveEditMode ? 0 : -1}
+      style={{ cursor: effectiveEditMode ? 'auto' : 'pointer' }}
+      onBlur={effectiveEditMode ? handleCardBlur : undefined}
     >
-      {editMode ? (
+      {effectiveEditMode ? (
         <div className="flex flex-col gap-1 h-full min-h-[180px]">
           <input
             className="border border-gray-300 rounded-md px-2 py-1 mb-1 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
@@ -114,10 +128,10 @@ const BoardCard = ({
             <EditorContent
               editor={editor}
               style={{ outline: 'none', boxShadow: 'none' }} // 移除 inline padding，統一用 CSS 控制
-              {...(editMode ? { onPointerDown: (e) => e.stopPropagation() } : {})}
+              {...(effectiveEditMode ? { onPointerDown: (e) => e.stopPropagation() } : {})}
             />
             {/* 只在內容區為空時顯示 placeholder，且不影響清單外觀 */}
-            {contentPlaceholder && !editor?.getText().trim() && editMode && (
+            {contentPlaceholder && !editor?.getText().trim() && effectiveEditMode && (
               <div className="absolute left-2 top-1 text-gray-300 pointer-events-none select-none z-10">
                 {contentPlaceholder}
               </div>
@@ -134,7 +148,7 @@ const BoardCard = ({
           </div>
         </div>
       ) : (
-        <div onDoubleClick={() => setEditMode && setEditMode(true)} className="select-none">
+        <div onDoubleClick={() => effectiveSetEditMode(true)} className="select-none">
           <div className="font-medium">{card.title}</div>
           <div
             className="prose prose-sm text-gray-600 text-sm text-left"

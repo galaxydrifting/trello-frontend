@@ -12,6 +12,7 @@ import { useBoardDnD } from '../hooks/useBoardDnD';
 import { useBoardMutations } from '../hooks/useBoardMutations';
 import { useBoardListsState } from '../hooks/useBoardListsState';
 import { v4 as uuidv4 } from 'uuid';
+import { BoardEditContext } from '../components/board/BoardEditContext';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -144,70 +145,84 @@ const BoardDetailPage = () => {
   if (isError || !board) return <div>無法取得看板資料</div>;
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
-      <AddListForm onAdd={handleAddList} isPending={createListMutation.isPending} />
-      {lists.length === 0 ? (
-        <div className="text-gray-400 text-center py-8">尚無清單</div>
-      ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={pointerWithin}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={lists.map((l) => l.id)} strategy={horizontalListSortingStrategy}>
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {lists.map((list) => (
-                <SortableListItem
-                  key={list.id}
-                  id={list.id}
-                  disabled={editingListId === list.id || !!editingCardId}
-                >
-                  <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
-                    <BoardListWithAddCard
-                      list={{ ...list, cards: localCards[list.id] || list.cards }}
-                      onAddCard={handleAddCard}
-                      isPending={createCardMutation.isPending}
-                      onEditList={(id, name) => updateListMutation.mutate({ id, name })}
-                      onDeleteList={handleDeleteList}
-                      isEditingList={updateListMutation.isPending}
-                      isDeletingList={deleteListMutation.isPending}
-                      onEditCard={(id, title, content) => {
-                        setLocalCards((prev) => {
-                          const newCards = { ...prev };
-                          for (const listId in newCards) {
-                            newCards[listId] = newCards[listId].map((c) =>
-                              c.id === id ? { ...c, title, content } : c
-                            );
-                          }
-                          return newCards;
-                        });
-                        updateCardMutation.mutate({ id, title, content });
-                      }}
-                      onDeleteCard={(id) => handleDeleteCard(list.id, id)}
-                      isEditingCard={updateCardMutation.isPending}
-                      isDeletingCard={deleteCardMutation.isPending}
-                      isListEditing={editingListId === list.id}
-                      setIsListEditing={(v: boolean) => {
-                        if (v && canEdit) setEditingListId(list.id);
-                        if (!v) setEditingListId(null);
-                      }}
-                      editingCardId={editingCardId}
-                      setEditingCardId={(id) => {
-                        if (id && canEdit) setEditingCardId(id);
-                        if (!id) setEditingCardId(null);
-                      }}
-                    />
-                  </SortableContext>
-                </SortableListItem>
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      )}
-    </div>
+    <BoardEditContext.Provider
+      value={{
+        editingListId,
+        setEditingListId,
+        editingCardId,
+        setEditingCardId,
+        canEdit,
+      }}
+    >
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
+        <AddListForm onAdd={handleAddList} isPending={createListMutation.isPending} />
+        {lists.length === 0 ? (
+          <div className="text-gray-400 text-center py-8">尚無清單</div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={pointerWithin}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={lists.map((l) => l.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                {lists.map((list) => (
+                  <SortableListItem
+                    key={list.id}
+                    id={list.id}
+                    disabled={editingListId === list.id || !!editingCardId}
+                  >
+                    <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
+                      <BoardListWithAddCard
+                        list={{ ...list, cards: localCards[list.id] || list.cards }}
+                        onAddCard={handleAddCard}
+                        isPending={createCardMutation.isPending}
+                        onEditList={(id, name) => updateListMutation.mutate({ id, name })}
+                        onDeleteList={handleDeleteList}
+                        isEditingList={updateListMutation.isPending}
+                        isDeletingList={deleteListMutation.isPending}
+                        onEditCard={(id, title, content) => {
+                          setLocalCards((prev) => {
+                            const newCards = { ...prev };
+                            for (const listId in newCards) {
+                              newCards[listId] = newCards[listId].map((c) =>
+                                c.id === id ? { ...c, title, content } : c
+                              );
+                            }
+                            return newCards;
+                          });
+                          updateCardMutation.mutate({ id, title, content });
+                        }}
+                        onDeleteCard={(id) => handleDeleteCard(list.id, id)}
+                        isEditingCard={updateCardMutation.isPending}
+                        isDeletingCard={deleteCardMutation.isPending}
+                        // ↓↓↓ context 取代 props drilling ↓↓↓
+                        // isListEditing={editingListId === list.id}
+                        // setIsListEditing={(v: boolean) => {
+                        //   if (v && canEdit) setEditingListId(list.id);
+                        //   if (!v) setEditingListId(null);
+                        // }}
+                        // editingCardId={editingCardId}
+                        // setEditingCardId={(id) => {
+                        //   if (id && canEdit) setEditingCardId(id);
+                        //   if (!id) setEditingCardId(null);
+                        // }}
+                      />
+                    </SortableContext>
+                  </SortableListItem>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
+      </div>
+    </BoardEditContext.Provider>
   );
 };
 

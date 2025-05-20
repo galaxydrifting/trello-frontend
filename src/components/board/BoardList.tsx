@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import SortableCardItem from './SortableCardItem';
 import { List } from './types';
 import BoardCard from './BoardCard';
+import { useBoardEditContext } from './BoardEditContext';
 
 interface BoardListProps {
   list: List;
@@ -13,10 +14,6 @@ interface BoardListProps {
   onDeleteCard?: (id: string) => void;
   isEditingCard?: boolean;
   isDeletingCard?: boolean;
-  isListEditing?: boolean;
-  setIsListEditing?: (v: boolean) => void;
-  editingCardId?: string | null;
-  setEditingCardId?: (id: string | null) => void;
   disableCardDrag?: boolean;
   // 新增卡片
   onAddCard?: (listId: string) => void;
@@ -35,10 +32,6 @@ const BoardList = ({
   onDeleteCard,
   isEditingCard,
   isDeletingCard,
-  isListEditing,
-  setIsListEditing,
-  editingCardId,
-  setEditingCardId,
   disableCardDrag = false,
   onAddCard,
   tempCardId,
@@ -46,8 +39,14 @@ const BoardList = ({
 }: BoardListProps) => {
   const [editName, setEditName] = useState(list.name);
   const [showDelete, setShowDelete] = useState(false);
-  const editMode = !!isListEditing;
-  const setEditMode = setIsListEditing || (() => {});
+  // 取 context
+  const { editingListId, setEditingListId, editingCardId, setEditingCardId, canEdit } =
+    useBoardEditContext();
+  const editMode = !!(editingListId === list.id);
+  const setEditMode = (v: boolean) => {
+    if (v && canEdit) setEditingListId(list.id);
+    if (!v) setEditingListId(null);
+  };
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -75,7 +74,7 @@ const BoardList = ({
     <div
       className={`bg-white rounded-xl min-w-[260px] p-4 relative group transition-all duration-200 
         ${
-          editMode
+          editingListId === list.id
             ? 'border-2 border-blue-400 shadow-lg ring-2 ring-blue-100'
             : 'border border-gray-200 shadow-md'
         }
@@ -179,9 +178,10 @@ const BoardList = ({
                   isEditing={isEditingCard}
                   isDeleting={isDeletingCard}
                   editMode={editingCardId === card.id}
-                  setEditMode={(v: boolean) =>
-                    setEditingCardId && setEditingCardId(v ? card.id : null)
-                  }
+                  setEditMode={(v: boolean) => {
+                    if (v && canEdit) setEditingCardId(card.id);
+                    if (!v) setEditingCardId(null);
+                  }}
                   {...(tempCardId === card.id
                     ? { onCancel: () => onCancelTempCard && onCancelTempCard(card.id) }
                     : {})}

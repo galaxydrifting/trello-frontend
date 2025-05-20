@@ -152,6 +152,31 @@ const BoardDetailPage = () => {
         editingCardId,
         setEditingCardId,
         canEdit,
+        // CRUD handler
+        onAddList: handleAddList,
+        onAddCard: handleAddCard,
+        onEditList: (id, name) => updateListMutation.mutate({ id, name }),
+        onDeleteList: handleDeleteList,
+        onEditCard: (id, title, content) => {
+          setLocalCards((prev) => {
+            const newCards = { ...prev };
+            for (const listId in newCards) {
+              newCards[listId] = newCards[listId].map((c) =>
+                c.id === id ? { ...c, title, content } : c
+              );
+            }
+            return newCards;
+          });
+          updateCardMutation.mutate({ id, title, content });
+        },
+        onDeleteCard: handleDeleteCard,
+        // mutation 狀態
+        isPendingAddList: createListMutation.isPending,
+        isPendingAddCard: createCardMutation.isPending,
+        isPendingEditList: updateListMutation.isPending,
+        isPendingDeleteList: deleteListMutation.isPending,
+        isPendingEditCard: updateCardMutation.isPending,
+        isPendingDeleteCard: deleteCardMutation.isPending,
       }}
     >
       <div className="p-4">
@@ -181,27 +206,7 @@ const BoardDetailPage = () => {
                     <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
                       <BoardListWithAddCard
                         list={{ ...list, cards: localCards[list.id] || list.cards }}
-                        onAddCard={handleAddCard}
-                        isPending={createCardMutation.isPending}
-                        onEditList={(id, name) => updateListMutation.mutate({ id, name })}
-                        onDeleteList={handleDeleteList}
-                        isEditingList={updateListMutation.isPending}
-                        isDeletingList={deleteListMutation.isPending}
-                        onEditCard={(id, title, content) => {
-                          setLocalCards((prev) => {
-                            const newCards = { ...prev };
-                            for (const listId in newCards) {
-                              newCards[listId] = newCards[listId].map((c) =>
-                                c.id === id ? { ...c, title, content } : c
-                              );
-                            }
-                            return newCards;
-                          });
-                          updateCardMutation.mutate({ id, title, content });
-                        }}
-                        onDeleteCard={(id) => handleDeleteCard(list.id, id)}
-                        isEditingCard={updateCardMutation.isPending}
-                        isDeletingCard={deleteCardMutation.isPending}
+                        // 移除所有 CRUD/mutation 相關 props drilling
                       />
                     </SortableContext>
                   </SortableListItem>

@@ -6,42 +6,34 @@ import { useBoardEditContext } from './BoardEditContext';
 
 interface BoardListProps {
   list: List;
-  onEdit?: (id: string, name: string) => void;
-  onDelete?: (id: string) => void;
-  isEditing?: boolean;
-  isDeleting?: boolean;
-  onEditCard?: (id: string, title: string, content: string) => void;
-  onDeleteCard?: (id: string) => void;
-  isEditingCard?: boolean;
-  isDeletingCard?: boolean;
-  disableCardDrag?: boolean;
   // 新增卡片
   onAddCard?: (listId: string) => void;
-  // 新增
   tempCardId?: string | null;
   onCancelTempCard?: (id: string) => void;
+  onEditCard?: (id: string, title: string) => void; // for tempCard only
 }
 
 const BoardList = ({
   list,
-  onEdit,
-  onDelete,
-  isEditing,
-  isDeleting,
-  onEditCard,
-  onDeleteCard,
-  isEditingCard,
-  isDeletingCard,
-  disableCardDrag = false,
   onAddCard,
   tempCardId,
   onCancelTempCard,
+  onEditCard,
 }: BoardListProps) => {
   const [editName, setEditName] = useState(list.name);
   const [showDelete, setShowDelete] = useState(false);
   // 取 context
-  const { editingListId, setEditingListId, editingCardId, setEditingCardId, canEdit } =
-    useBoardEditContext();
+  const {
+    editingListId,
+    setEditingListId,
+    editingCardId,
+    setEditingCardId,
+    canEdit,
+    onEditList,
+    onDeleteList,
+    isPendingEditList,
+    isPendingDeleteList,
+  } = useBoardEditContext();
   const editMode = !!(editingListId === list.id);
   const setEditMode = (v: boolean) => {
     if (v && canEdit) setEditingListId(list.id);
@@ -58,9 +50,9 @@ const BoardList = ({
 
   // 失焦時自動儲存
   const handleBlur = () => {
-    if (onEdit && editName.trim() && editName !== list.name) {
+    if (onEditList && editName.trim() && editName !== list.name) {
       setEditName(editName.trim()); // 立即本地更新
-      onEdit(list.id, editName.trim());
+      onEditList(list.id, editName.trim());
     }
     setEditMode(false);
   };
@@ -88,7 +80,7 @@ const BoardList = ({
             tabIndex={0}
             style={{ boxShadow: 'none', border: 'none', outline: 'none' }}
             onClick={() => setShowDelete(true)}
-            disabled={isDeleting}
+            disabled={isPendingDeleteList}
             title="刪除清單"
             aria-label="刪除清單"
           >
@@ -132,9 +124,9 @@ const BoardList = ({
           className="flex gap-2 mb-2"
           onSubmit={(e) => {
             e.preventDefault();
-            if (onEdit && editName.trim() && editName !== list.name) {
-              setEditName(editName.trim()); // 立即本地更新
-              onEdit(list.id, editName.trim());
+            if (onEditList && editName.trim() && editName !== list.name) {
+              setEditName(editName.trim());
+              onEditList(list.id, editName.trim());
             }
             setEditMode(false);
           }}
@@ -145,7 +137,7 @@ const BoardList = ({
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             onBlur={handleBlur}
-            disabled={isEditing}
+            disabled={isPendingEditList}
             autoFocus
           />
         </form>
@@ -169,14 +161,11 @@ const BoardList = ({
               <SortableCardItem
                 key={card.id}
                 id={card.id}
-                disabled={disableCardDrag || !!editingCardId}
+                disabled={!!isPendingEditList || !!editingCardId}
               >
                 <BoardCard
                   card={card}
-                  onEdit={onEditCard}
-                  onDelete={onDeleteCard}
-                  isEditing={isEditingCard}
-                  isDeleting={isDeletingCard}
+                  // 只傳遞 tempCard 相關 UI 控制
                   editMode={editingCardId === card.id}
                   setEditMode={(v: boolean) => {
                     if (v && canEdit) setEditingCardId(card.id);
@@ -185,9 +174,8 @@ const BoardList = ({
                   {...(tempCardId === card.id
                     ? { onCancel: () => onCancelTempCard && onCancelTempCard(card.id) }
                     : {})}
-                  {...(tempCardId === card.id
-                    ? { titlePlaceholder: '輸入卡片標題', contentPlaceholder: '輸入卡片內容' }
-                    : {})}
+                  {...(tempCardId === card.id ? { titlePlaceholder: '輸入卡片標題' } : {})}
+                  {...(tempCardId === card.id ? { onEdit: onEditCard } : {})}
                 />
               </SortableCardItem>
             ))}
@@ -202,17 +190,17 @@ const BoardList = ({
               <button
                 className="px-3 py-1 bg-gray-200 rounded"
                 onClick={() => setShowDelete(false)}
-                disabled={isDeleting}
+                disabled={isPendingDeleteList}
               >
                 取消
               </button>
               <button
                 className="px-3 py-1 bg-red-600 text-white rounded"
                 onClick={() => {
-                  if (onDelete) onDelete(list.id);
+                  if (onDeleteList) onDeleteList(list.id);
                   setShowDelete(false);
                 }}
-                disabled={isDeleting}
+                disabled={isPendingDeleteList}
               >
                 確定刪除
               </button>

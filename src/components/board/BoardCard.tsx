@@ -7,10 +7,6 @@ import { useBoardEditContext } from './BoardEditContext';
 
 interface BoardCardProps {
   card: Card;
-  onEdit?: (id: string, title: string, content: string) => void;
-  onDelete?: (id: string) => void;
-  isEditing?: boolean;
-  isDeleting?: boolean;
   editMode?: boolean;
   setEditMode?: (v: boolean) => void;
   // 新增
@@ -21,10 +17,6 @@ interface BoardCardProps {
 
 const BoardCard = ({
   card,
-  onEdit,
-  onDelete,
-  isEditing,
-  isDeleting,
   editMode,
   setEditMode,
   onCancel,
@@ -45,7 +37,16 @@ const BoardCard = ({
   });
 
   // 取 context
-  const { editingCardId, setEditingCardId, canEdit } = useBoardEditContext();
+  const {
+    editingCardId,
+    setEditingCardId,
+    canEdit,
+    onEditCard,
+    onDeleteCard,
+    isPendingEditCard,
+    isPendingDeleteCard,
+    editingListId,
+  } = useBoardEditContext();
   // 讓 editable 狀態隨 editMode/context 變化
   useEffect(() => {
     const mode = typeof editMode === 'boolean' ? editMode : editingCardId === card.id;
@@ -62,15 +63,23 @@ const BoardCard = ({
       if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
         if (!isBlurring) {
           setIsBlurring(true);
-          if (onEdit && editTitle.trim() && editor) {
-            await onEdit(card.id, editTitle.trim(), editor.getHTML());
+          if (isTempCard) {
+            // 新增卡片時，交由 onEditCard 處理（只傳 id, title, content）
+            if (onEditCard && editTitle.trim() && editor) {
+              onEditCard(card.id, editTitle.trim(), editor.getHTML());
+            }
+          } else {
+            // 一般卡片編輯
+            if (onEditCard && editTitle.trim() && editor) {
+              onEditCard(card.id, editTitle.trim(), editor.getHTML());
+            }
           }
           setIsBlurring(false);
           if (setEditMode) setEditMode(false);
         }
       }
     },
-    [cardRef, isBlurring, onEdit, editTitle, editor, card.id, setEditMode]
+    [cardRef, isBlurring, onEditCard, editTitle, editor, card.id, setEditMode, isTempCard]
   );
 
   // MenuBar 事件也用 useCallback 包裝
@@ -80,9 +89,9 @@ const BoardCard = ({
   }, [onCancel, setEditMode]);
 
   const handleDelete = useCallback(async () => {
-    if (onDelete) await onDelete(card.id);
+    if (onDeleteCard && editingListId) await onDeleteCard(editingListId, card.id);
     if (setEditMode) setEditMode(false);
-  }, [onDelete, card.id, setEditMode]);
+  }, [onDeleteCard, editingListId, card.id, setEditMode]);
 
   // 若有傳入 editMode/setEditMode 則優先用 props，否則用 context
   const effectiveEditMode = typeof editMode === 'boolean' ? editMode : editingCardId === card.id;
@@ -93,7 +102,6 @@ const BoardCard = ({
         if (!v) setEditingCardId(null);
       };
 
-  // 其餘 props 只傳給 BoardCard 需要的部分，未用到的 props 不再傳遞
   return (
     <div
       ref={cardRef}
@@ -115,7 +123,7 @@ const BoardCard = ({
             className="border border-gray-300 rounded-md px-2 py-1 mb-1 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
-            disabled={isEditing}
+            disabled={isPendingEditCard}
             required
             autoFocus
             placeholder={titlePlaceholder}
@@ -127,10 +135,9 @@ const BoardCard = ({
           >
             <EditorContent
               editor={editor}
-              style={{ outline: 'none', boxShadow: 'none' }} // 移除 inline padding，統一用 CSS 控制
+              style={{ outline: 'none', boxShadow: 'none' }}
               {...(effectiveEditMode ? { onPointerDown: (e) => e.stopPropagation() } : {})}
             />
-            {/* 只在內容區為空時顯示 placeholder，且不影響清單外觀 */}
             {contentPlaceholder && !editor?.getText().trim() && effectiveEditMode && (
               <div className="absolute left-2 top-1 text-gray-300 pointer-events-none select-none z-10">
                 {contentPlaceholder}
@@ -141,7 +148,7 @@ const BoardCard = ({
             <MenuBar
               editor={editor}
               isTempCard={isTempCard}
-              isDeleting={isDeleting}
+              isDeleting={isPendingDeleteCard}
               onCancel={handleCancel}
               onDelete={handleDelete}
             />

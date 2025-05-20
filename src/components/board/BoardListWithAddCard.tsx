@@ -5,51 +5,28 @@ import { List } from './types';
 
 interface BoardListWithAddCardProps {
   list: List;
-  onAddCard: (listId: string, title: string, content: string) => void;
-  isPending: boolean;
-  onEditList?: (id: string, name: string) => void;
-  onDeleteList?: (id: string) => void;
-  isEditingList?: boolean;
-  isDeletingList?: boolean;
-  onEditCard?: (id: string, title: string, content: string) => void;
-  onDeleteCard?: (id: string) => void;
-  isEditingCard?: boolean;
-  isDeletingCard?: boolean;
 }
 
-const BoardListWithAddCard = ({
-  list,
-  onAddCard,
-  isPending,
-  onEditList,
-  onDeleteList,
-  isEditingList,
-  isDeletingList,
-  onEditCard,
-  onDeleteCard,
-  isEditingCard,
-  isDeletingCard,
-}: BoardListWithAddCardProps) => {
+const BoardListWithAddCard = ({ list }: BoardListWithAddCardProps) => {
   const [tempCard, setTempCard] = useState<null | { id: string; title: string; content: string }>(
     null
   );
   const [isAdding, setIsAdding] = useState(false);
 
+  // 只負責新增卡片的暫存 UI 狀態，mutation/CRUD 交由 BoardList 內部 context 處理
   const handleAddCardClick = () => {
-    if (isPending || isAdding) return;
+    if (isAdding) return;
     const tempId = 'temp-' + uuidv4();
     setTempCard({ id: tempId, title: '', content: '' });
     setIsAdding(true);
   };
 
-  const handleSaveTempCard = (id: string, title: string, content: string) => {
+  const handleSaveTempCard = (id: string, title: string) => {
     if (!title.trim()) return;
     if (tempCard && id === tempCard.id) {
-      onAddCard(list.id, title, content);
+      // 只負責 UI 狀態，實際新增交由 BoardList 內部 context
       setTempCard(null);
       setIsAdding(false);
-    } else if (onEditCard) {
-      onEditCard(id, title, content);
     }
   };
 
@@ -66,18 +43,10 @@ const BoardListWithAddCard = ({
     <div className="min-w-[260px]">
       <BoardList
         list={{ ...list, cards }}
-        onEdit={onEditList}
-        onDelete={onDeleteList}
-        onEditCard={handleSaveTempCard}
-        onDeleteCard={onDeleteCard}
-        isEditing={isEditingList}
-        isDeleting={isDeletingList}
-        isEditingCard={isEditingCard}
-        isDeletingCard={isDeletingCard}
-        disableCardDrag={!!isEditingList}
         onAddCard={handleAddCardClick}
         tempCardId={tempCard?.id}
         onCancelTempCard={handleCancelTempCard}
+        onEditCard={handleSaveTempCard}
       />
     </div>
   );

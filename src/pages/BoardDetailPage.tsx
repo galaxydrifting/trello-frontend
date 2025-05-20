@@ -202,17 +202,6 @@ const BoardDetailPage = () => {
                         onDeleteCard={(id) => handleDeleteCard(list.id, id)}
                         isEditingCard={updateCardMutation.isPending}
                         isDeletingCard={deleteCardMutation.isPending}
-                        // ↓↓↓ context 取代 props drilling ↓↓↓
-                        // isListEditing={editingListId === list.id}
-                        // setIsListEditing={(v: boolean) => {
-                        //   if (v && canEdit) setEditingListId(list.id);
-                        //   if (!v) setEditingListId(null);
-                        // }}
-                        // editingCardId={editingCardId}
-                        // setEditingCardId={(id) => {
-                        //   if (id && canEdit) setEditingCardId(id);
-                        //   if (!id) setEditingCardId(null);
-                        // }}
                       />
                     </SortableContext>
                   </SortableListItem>

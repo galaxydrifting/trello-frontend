@@ -9,7 +9,8 @@
       "extensions": [
         "vitest.explorer",
         "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "ms-playwright.playwright"
       ]
     }
   }

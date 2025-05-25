@@ -80,7 +80,7 @@ describe('LoginPage 整合測試', () => {
     expect(localStorage.getItem('token')).toBe(mockToken);
   });
 
-  it('登入失敗時應該顯示錯誤訊息', async () => {
+  it('帳號或密碼錯誤時應該顯示錯誤訊息', async () => {
     vi.resetModules();
     localStorage.clear();
     const user = userEvent.setup();

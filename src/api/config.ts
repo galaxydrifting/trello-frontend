@@ -29,8 +29,14 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
-      window.location.href = '/'; // 401 時導向登入頁
+    // 只有在有 token 且非登入 API 時才自動導向登入頁
+    // 例如：
+    // 有 token 時呼叫 /api/boards（非登入 API）回傳 401，才會自動導向登入頁
+    // 但呼叫 /auth/login 回傳 401 則不會導向
+    const token = localStorage.getItem('token');
+    const isLoginApi = error.config && error.config.url && error.config.url.includes('/auth/login');
+    if (error.response && error.response.status === 401 && token && !isLoginApi) {
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

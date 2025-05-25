@@ -44,19 +44,83 @@ describe('LoginPage 整合測試', () => {
     expect(screen.getByPlaceholderText(/密碼/i)).toBeInTheDocument();
   });
 
-  it('應該在表單提交時處理登入流程', async () => {
+  it('登入成功時應該導向 /boards', async () => {
+    vi.resetModules();
+    localStorage.clear();
     const user = userEvent.setup();
-    renderLoginPage();
-
-    // 填寫表單
+    const mockNavigate = vi.fn();
+    vi.doMock('react-router-dom', async () => {
+      const actual = await vi.importActual('react-router-dom');
+      return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+      };
+    });
+    const mockToken = 'mock-token';
+    const mockPost = vi.fn().mockResolvedValue({ data: { token: mockToken } });
+    vi.doMock('../../api/config', () => ({
+      default: { post: mockPost },
+    }));
+    const { default: LoginPage } = await import('../LoginPage');
+    render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <LoginPage />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
     await user.type(screen.getByPlaceholderText(/電子郵件/i), 'test@example.com');
     await user.type(screen.getByPlaceholderText(/密碼/i), 'password123');
-
-    // 提交表單
     await user.click(screen.getByRole('button', { name: /登入/i }));
+    expect(mockPost).toHaveBeenCalledWith('/auth/login', {
+      email: 'test@example.com',
+      password: 'password123',
+    });
+    expect(mockNavigate).toHaveBeenCalledWith('/boards');
+    expect(localStorage.getItem('token')).toBe(mockToken);
+  });
 
-    // 驗證基本流程完成
-    // 注意：這裡不測試具體的 API 調用邏輯，那部分應該在 LoginForm 元件測試中完成
-    expect(screen.getByRole('button')).toBeInTheDocument();
+  it('登入失敗時應該顯示錯誤訊息', async () => {
+    vi.resetModules();
+    localStorage.clear();
+    const user = userEvent.setup();
+    vi.doMock('react-router-dom', async () => {
+      const actual = await vi.importActual('react-router-dom');
+      return {
+        ...actual,
+        useNavigate: () => vi.fn(),
+      };
+    });
+    // 使用 AxiosError 產生 error，補齊 config 屬性
+    const { AxiosError, AxiosHeaders } = await import('axios');
+    const error = new AxiosError(
+      '認證失敗',
+      '401',
+      { url: '/auth/login', method: 'post', headers: new AxiosHeaders() },
+      undefined,
+      {
+        status: 401,
+        data: { message: '帳號或密碼錯誤' },
+        statusText: 'Unauthorized',
+        headers: {},
+        config: { headers: new AxiosHeaders() },
+      }
+    );
+    const mockPost = vi.fn().mockRejectedValue(error);
+    vi.doMock('../../api/config', () => ({
+      default: { post: mockPost },
+    }));
+    const { default: LoginPage } = await import('../LoginPage');
+    render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <LoginPage />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    await user.type(screen.getByPlaceholderText(/電子郵件/i), 'test@example.com');
+    await user.type(screen.getByPlaceholderText(/密碼/i), 'wrongpassword');
+    await user.click(screen.getByRole('button', { name: /登入/i }));
+    expect(await screen.findByText('帳號或密碼錯誤')).toBeInTheDocument();
   });
 });

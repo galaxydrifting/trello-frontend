@@ -12,5 +12,6 @@ export default defineConfig({
       reporter: ['text', 'html'], // 產生文字和 HTML 格式的覆蓋率報告
       exclude: ['node_modules/', 'src/test/setup.ts'],
     },
+    exclude: ['e2e/**', 'node_modules', 'dist'],
   },
 });

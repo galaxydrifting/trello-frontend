@@ -84,12 +84,7 @@ const MOVE_LIST_MUTATION = `mutation MoveList($input: MoveListInput!) {
     id
     name
     position
-    cards {
-      id
-      title
-      content
-      position
-    }
+    boardId
   }
 }`;
 

@@ -45,8 +45,12 @@ const BoardDetailPage = () => {
     setLists,
     localCards,
     setLocalCards,
-    moveList,
-    moveCard,
+    moveList: async (id, newIndex) => {
+      await moveList(id, newIndex);
+    },
+    moveCard: async (cardId, toListId, toIndex) => {
+      await moveCard(cardId, toListId, toIndex);
+    },
     invalidateBoard: () => queryClient.invalidateQueries({ queryKey: ['board', boardId] }),
   });
 
@@ -65,7 +69,14 @@ const BoardDetailPage = () => {
 
   const handleAddList = (name: string) => {
     const tempId = 'temp-' + uuidv4();
-    const optimisticList = { id: tempId, name, cards: [] };
+    // 修正：補齊 List 介面所需欄位
+    const optimisticList = {
+      id: tempId,
+      name,
+      boardId: boardId!,
+      position: lists.length > 0 ? Math.max(...lists.map((l) => l.position)) + 1 : 1,
+      cards: [],
+    };
     setLists((prev) => [...prev, optimisticList]);
     createListMutation.mutate(name, {
       onSuccess: (data) => {
@@ -81,7 +92,15 @@ const BoardDetailPage = () => {
   // 新增卡片（樂觀更新）
   const handleAddCard = (listId: string, title: string, content: string) => {
     const tempId = 'temp-' + uuidv4();
-    const optimisticCard = { id: tempId, title, content };
+    // 修正：補齊 Card 介面所需欄位
+    const optimisticCard = {
+      id: tempId,
+      title,
+      content,
+      position: 0,
+      listId,
+      boardId: boardId!,
+    };
     setLocalCards((prev) => {
       const newCards = { ...prev };
       newCards[listId] = [optimisticCard, ...(newCards[listId] || [])]; // 插入最前面

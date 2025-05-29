@@ -40,15 +40,20 @@ const BoardListWithAddCard = ({
 }: BoardListWithAddCardProps) => {
   const [isListEditingState, setIsListEditingState] = useState(false);
   const [editingCardIdState, setEditingCardIdState] = useState<string | null>(null);
-  const [tempCard, setTempCard] = useState<null | { id: string; title: string; content: string }>(
-    null
-  );
+  const [tempCard, setTempCard] = useState<null | import('./types').Card>(null);
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddCardClick = () => {
     if (isPending || isAdding) return;
     const tempId = 'temp-' + uuidv4();
-    setTempCard({ id: tempId, title: '', content: '' });
+    setTempCard({
+      id: tempId,
+      title: '',
+      content: '',
+      position: 0, // 暫存卡片預設 0
+      listId: list.id,
+      boardId: list.boardId,
+    });
     setEditingCardIdState(tempId);
     setIsAdding(true);
   };

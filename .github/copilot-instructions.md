@@ -11,16 +11,27 @@
 - 非同步操作請加上 try/catch 處理錯誤，並記錄錯誤資訊。
 - 註解請簡潔明確，必要時補充型別說明。
 
-## React 規範
+## React 與相關函式庫規範
 
+- React 版本：請使用 React 19.x。
+- React Query：請統一使用 @tanstack/react-query 5.x 進行資料請求與快取管理，優先使用 hooks API（如 useQuery、useMutation），必要時搭配 queryClient 操作快取。
 - 一律使用函式型元件（Function Component）與 hooks。
 - 遵循 React hooks 規則（不可在條件式中呼叫 hooks）。
 - 有 children 的元件型別使用 React.FC。
 - 元件保持單一職責，避免過大。
-- 樣式優先使用 CSS Modules。
+- 元件 props 與狀態請明確定義 TypeScript 型別。
+- 非同步操作請加上 try/catch 處理錯誤，並記錄錯誤資訊。
+
+## 樣式規範
+
+- 優先使用 Tailwind CSS 撰寫樣式，僅於特殊需求下才使用 CSS Modules。
+- Tailwind class 命名請遵循官方建議，並保持語意清晰。
+
+## 表單管理
+
 - 表單管理請使用 react-hook-form。
 - 表單驗證請使用 yup，驗證 schema 請獨立檔案管理。
-- 元件 props 與狀態請明確定義 TypeScript 型別。
+- 若 react-hook-form 新版支援 React 19 特性，請優先採用。
 
 ## 測試規範
 

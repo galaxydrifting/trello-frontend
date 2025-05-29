@@ -22,26 +22,14 @@ const CREATE_BOARD_MUTATION = `mutation CreateBoard($input: CreateBoardInput!) {
     id
     name
     position
-    lists {
-      id
-      name
-      cards {
-        id
-        title
-        content
-      }
-    }
   }
 }`;
 const CREATE_LIST_MUTATION = `mutation CreateList($input: CreateListInput!) {
   createList(input: $input) {
     id
     name
-    cards {
-      id
-      title
-      content
-    }
+    boardId
+    position
   }
 }`;
 const CREATE_CARD_MUTATION = `mutation CreateCard($input: CreateCardInput!) {
@@ -49,21 +37,16 @@ const CREATE_CARD_MUTATION = `mutation CreateCard($input: CreateCardInput!) {
     id
     title
     content
+    position
+    listId
+    boardId
   }
 }`;
 const UPDATE_BOARD_MUTATION = `mutation UpdateBoard($input: UpdateBoardInput!) {
   updateBoard(input: $input) {
     id
     name
-    lists {
-      id
-      name
-      cards {
-        id
-        title
-        content
-      }
-    }
+    position
   }
 }`;
 
@@ -75,11 +58,8 @@ const UPDATE_LIST_MUTATION = `mutation UpdateList($input: UpdateListInput!) {
   updateList(input: $input) {
     id
     name
-    cards {
-      id
-      title
-      content
-    }
+    position
+    boardId
   }
 }`;
 

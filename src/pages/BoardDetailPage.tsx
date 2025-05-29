@@ -69,7 +69,8 @@ const BoardDetailPage = () => {
     setLists((prev) => [...prev, optimisticList]);
     createListMutation.mutate(name, {
       onSuccess: (data) => {
-        setLists((prev) => prev.map((l) => (l.id === tempId ? data : l)));
+        // 確保回傳的 list 也有 cards: []
+        setLists((prev) => prev.map((l) => (l.id === tempId ? { ...data, cards: [] } : l)));
       },
       onError: () => {
         setLists((prev) => prev.filter((l) => l.id !== tempId));

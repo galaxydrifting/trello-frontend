@@ -17,7 +17,8 @@
 - React Query：請統一使用 @tanstack/react-query 5.x 進行資料請求與快取管理，優先使用 hooks API（如 useQuery、useMutation），必要時搭配 queryClient 操作快取。
 - 一律使用函式型元件（Function Component）與 hooks。
 - 遵循 React hooks 規則（不可在條件式中呼叫 hooks）。
-- 有 children 的元件型別使用 React.FC。
+- 一律優先使用箭頭函式（arrow function）撰寫元件，並避免使用 React.FC。
+- 僅在箭頭函式無法達成需求時（如需使用 this 或特殊情境）才使用 function 宣告。
 - 元件保持單一職責，避免過大。
 - 元件 props 與狀態請明確定義 TypeScript 型別。
 - 非同步操作請加上 try/catch 處理錯誤，並記錄錯誤資訊。

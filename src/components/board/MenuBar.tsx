@@ -1,6 +1,5 @@
 import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered, MdCancel } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import React from 'react';
 import { Editor } from '@tiptap/react';
 
 interface MenuBarProps {
@@ -11,13 +10,7 @@ interface MenuBarProps {
   onDelete?: () => void;
 }
 
-const MenuBar: React.FC<MenuBarProps> = ({
-  editor,
-  isTempCard,
-  isDeleting,
-  onCancel,
-  onDelete,
-}) => (
+const MenuBar = ({ editor, isTempCard, isDeleting, onCancel, onDelete }: MenuBarProps) => (
   <div className="flex gap-1 items-center w-full justify-between">
     <div className="flex gap-1">
       <button

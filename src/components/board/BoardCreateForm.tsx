@@ -8,12 +8,12 @@ interface BoardCreateFormProps {
   isPending: boolean;
 }
 
-const BoardCreateForm: React.FC<BoardCreateFormProps> = ({
+const BoardCreateForm = ({
   newBoardName,
   setNewBoardName,
   onCreate,
   isPending,
-}) => (
+}: BoardCreateFormProps) => (
   <form
     className="flex gap-2 mb-8 bg-white rounded-xl shadow-md p-4 items-center"
     onSubmit={onCreate}

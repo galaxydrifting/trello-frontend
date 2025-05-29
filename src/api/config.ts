@@ -8,15 +8,20 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
+// 私有工具函數：將 token 附加到請求 headers
+function _attachTokenToConfig<T extends AxiosRequestConfig>(config: T): T {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+}
+
 // 請求攔截器
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
+    return _attachTokenToConfig(config);
   },
   (error) => {
     return Promise.reject(error);
@@ -44,12 +49,7 @@ apiClient.interceptors.response.use(
 
 // 匯出 attachToken 供測試直接調用
 export function attachToken(config: AxiosRequestConfig): AxiosRequestConfig {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
-  return config;
+  return _attachTokenToConfig(config);
 }
 
 export default apiClient;

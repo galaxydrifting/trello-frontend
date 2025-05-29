@@ -140,6 +140,21 @@ const BoardDetailPage = () => {
     });
   };
 
+  // 編輯清單名稱（樂觀更新）
+  const handleEditList = (id: string, name: string) => {
+    // 先本地更新 lists
+    setLists((prev) => prev.map((l) => (l.id === id ? { ...l, name } : l)));
+    updateListMutation.mutate(
+      { id, name },
+      {
+        onError: () => {
+          // 若失敗，回復原本名稱（重新 fetch）
+          queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+        },
+      }
+    );
+  };
+
   if (isLoading) return <div>載入中...</div>;
   if (isError || !board) return <div>無法取得看板資料</div>;
 
@@ -170,7 +185,7 @@ const BoardDetailPage = () => {
                       list={{ ...list, cards: localCards[list.id] || list.cards }}
                       onAddCard={handleAddCard}
                       isPending={createCardMutation.isPending}
-                      onEditList={(id, name) => updateListMutation.mutate({ id, name })}
+                      onEditList={handleEditList}
                       onDeleteList={handleDeleteList}
                       isEditingList={updateListMutation.isPending}
                       isDeletingList={deleteListMutation.isPending}

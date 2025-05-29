@@ -1,5 +1,5 @@
-import apiClient from './config';
-import { Board } from '../components/board/types';
+import { postGraphQL } from './postGraphQL';
+import { Board, List, Card } from '../components/board/types';
 
 const BOARDS_QUERY = `query { boards { id name position } }`;
 const BOARD_DETAIL_QUERY = `query BoardDetail($id: ID!) {
@@ -99,34 +99,27 @@ const MOVE_CARD_MUTATION = `mutation MoveCard($input: MoveCardInput!) {
 }`;
 
 export const fetchBoards = async (): Promise<Board[]> => {
-  const res = await apiClient.post('/graphql/query', {
-    query: BOARDS_QUERY,
-  });
-  return res.data.data.boards;
+  const data = await postGraphQL<{ boards: Board[] }>(BOARDS_QUERY);
+  return data.boards;
 };
 
 export const fetchBoard = async (boardId: string): Promise<Board> => {
-  const res = await apiClient.post('/graphql/query', {
-    query: BOARD_DETAIL_QUERY,
-    variables: { id: boardId },
-  });
-  return res.data.data.board;
+  const data = await postGraphQL<{ board: Board }>(BOARD_DETAIL_QUERY, { id: boardId });
+  return data.board;
 };
 
 export const createBoard = async (name: string, position: number): Promise<Board> => {
-  const res = await apiClient.post('/graphql/query', {
-    query: CREATE_BOARD_MUTATION,
-    variables: { input: { name, position } },
+  const data = await postGraphQL<{ createBoard: Board }>(CREATE_BOARD_MUTATION, {
+    input: { name, position },
   });
-  return res.data.data.createBoard;
+  return data.createBoard;
 };
 
-export const createList = async (boardId: string, name: string) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: CREATE_LIST_MUTATION,
-    variables: { input: { boardId, name } },
+export const createList = async (boardId: string, name: string): Promise<List> => {
+  const data = await postGraphQL<{ createList: List }>(CREATE_LIST_MUTATION, {
+    input: { boardId, name },
   });
-  return res.data.data.createList;
+  return data.createList;
 };
 
 export const createCard = async (
@@ -134,74 +127,63 @@ export const createCard = async (
   listId: string,
   title: string,
   content: string
-) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: CREATE_CARD_MUTATION,
-    variables: { input: { boardId, listId, title, content } },
+): Promise<Card> => {
+  const data = await postGraphQL<{ createCard: Card }>(CREATE_CARD_MUTATION, {
+    input: { boardId, listId, title, content },
   });
-  return res.data.data.createCard;
+  return data.createCard;
 };
 
 export const updateBoard = async (id: string, name: string): Promise<Board> => {
-  const res = await apiClient.post('/graphql/query', {
-    query: UPDATE_BOARD_MUTATION,
-    variables: { input: { id, name } },
+  const data = await postGraphQL<{ updateBoard: Board }>(UPDATE_BOARD_MUTATION, {
+    input: { id, name },
   });
-  return res.data.data.updateBoard;
+  return data.updateBoard;
 };
 
 export const deleteBoard = async (id: string): Promise<boolean> => {
-  const res = await apiClient.post('/graphql/query', {
-    query: DELETE_BOARD_MUTATION,
-    variables: { id },
-  });
-  return res.data.data.deleteBoard;
+  const data = await postGraphQL<{ deleteBoard: boolean }>(DELETE_BOARD_MUTATION, { id });
+  return data.deleteBoard;
 };
 
-export const updateList = async (id: string, name: string) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: UPDATE_LIST_MUTATION,
-    variables: { input: { id, name } },
+export const updateList = async (id: string, name: string): Promise<List> => {
+  const data = await postGraphQL<{ updateList: List }>(UPDATE_LIST_MUTATION, {
+    input: { id, name },
   });
-  return res.data.data.updateList;
+  return data.updateList;
 };
 
-export const deleteList = async (id: string) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: DELETE_LIST_MUTATION,
-    variables: { id },
-  });
-  return res.data.data.deleteList;
+export const deleteList = async (id: string): Promise<boolean> => {
+  const data = await postGraphQL<{ deleteList: boolean }>(DELETE_LIST_MUTATION, { id });
+  return data.deleteList;
 };
 
-export const updateCard = async (id: string, title: string, content: string) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: UPDATE_CARD_MUTATION,
-    variables: { input: { id, title, content } },
+export const updateCard = async (id: string, title: string, content: string): Promise<Card> => {
+  const data = await postGraphQL<{ updateCard: Card }>(UPDATE_CARD_MUTATION, {
+    input: { id, title, content },
   });
-  return res.data.data.updateCard;
+  return data.updateCard;
 };
 
-export const deleteCard = async (id: string) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: DELETE_CARD_MUTATION,
-    variables: { id },
-  });
-  return res.data.data.deleteCard;
+export const deleteCard = async (id: string): Promise<boolean> => {
+  const data = await postGraphQL<{ deleteCard: boolean }>(DELETE_CARD_MUTATION, { id });
+  return data.deleteCard;
 };
 
-export const moveList = async (id: string, newPosition: number) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: MOVE_LIST_MUTATION,
-    variables: { input: { id, newPosition } },
+export const moveList = async (id: string, newPosition: number): Promise<List> => {
+  const data = await postGraphQL<{ moveList: List }>(MOVE_LIST_MUTATION, {
+    input: { id, newPosition },
   });
-  return res.data.data.moveList;
+  return data.moveList;
 };
 
-export const moveCard = async (id: string, targetListId: string, newPosition: number) => {
-  const res = await apiClient.post('/graphql/query', {
-    query: MOVE_CARD_MUTATION,
-    variables: { input: { id, targetListId, newPosition } },
+export const moveCard = async (
+  id: string,
+  targetListId: string,
+  newPosition: number
+): Promise<Card> => {
+  const data = await postGraphQL<{ moveCard: Card }>(MOVE_CARD_MUTATION, {
+    input: { id, targetListId, newPosition },
   });
-  return res.data.data.moveCard;
+  return data.moveCard;
 };

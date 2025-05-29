@@ -19,9 +19,6 @@ export function useLoginMutation() {
         navigate('/boards');
       }
     },
-    onError: (error: LoginError) => {
-      console.error('Login failed:', error);
-    },
     retry: 1,
     retryDelay: 1000,
   });

@@ -9,7 +9,14 @@ describe('BoardList', () => {
     boardId: 'board-1',
     position: 1,
     cards: [
-      { id: 'card-1', title: 'Card 1', content: 'Content 1', position: 1, listId: 'list-1', boardId: 'board-1' },
+      {
+        id: 'card-1',
+        title: 'Card 1',
+        content: 'Content 1',
+        position: 1,
+        listId: 'list-1',
+        boardId: 'board-1',
+      },
     ],
   };
 

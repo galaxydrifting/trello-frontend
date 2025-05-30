@@ -37,9 +37,7 @@ describe('BoardCard', () => {
 
   it('calls onDelete when delete button clicked', () => {
     const onDelete = vi.fn();
-    render(
-      <BoardCard card={baseCard} editMode setEditMode={() => {}} onDelete={onDelete} />
-    );
+    render(<BoardCard card={baseCard} editMode setEditMode={() => {}} onDelete={onDelete} />);
     // 觸發 MenuBar 的刪除
     // 這裡僅測試 onDelete 是否可呼叫
     onDelete('card-1');

@@ -55,8 +55,8 @@ const BoardListWithAddCard = ({
   };
 
   const handleSaveTempCard = (id: string, title: string, content: string) => {
-    if (!title.trim()) return;
     if (tempCard && id === tempCard.id) {
+      // 允許空白標題與內容，直接呼叫 onAddCard
       onAddCard(list.id, title, content);
       setTempCard(null);
       setEditingListId(null);

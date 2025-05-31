@@ -32,6 +32,18 @@ const BoardCard = ({
 }: BoardCardProps) => {
   const [editTitle, setEditTitle] = useState(card.title);
   const [isBlurring, setIsBlurring] = useState(false); // 防止重複觸發
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // 新增：每次進入編輯模式時重設暫存內容
+  useEffect(() => {
+    if (editMode) {
+      setEditTitle(card.title);
+      if (editor) {
+        editor.commands.setContent(card.content || '');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editMode, card.title, card.content]);
 
   // 判斷是否為暫存卡片（尚未送出到後端）
   const isTempCard = card.id.startsWith('temp-');
@@ -50,16 +62,14 @@ const BoardCard = ({
     }
   }, [editMode, editor]);
 
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  // 失焦時自動儲存（只要焦點離開整個卡片區塊就儲存）
+  // 失焦時直接儲存
   const handleCardBlur = useCallback(
     async (e: React.FocusEvent<HTMLDivElement>) => {
       if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
         if (!isBlurring) {
           setIsBlurring(true);
-          if (onEdit && editTitle.trim() && editor) {
-            await onEdit(card.id, editTitle.trim(), editor.getHTML());
+          if (onEdit && editor) {
+            await onEdit(card.id, editTitle, editor.getHTML());
           }
           setIsBlurring(false);
           if (setEditMode) setEditMode(false);
@@ -80,6 +90,14 @@ const BoardCard = ({
     if (setEditMode) setEditMode(false);
   }, [onDelete, card.id, setEditMode]);
 
+  // 儲存按鈕事件
+  const handleSave = async () => {
+    if (onEdit && editor) {
+      await onEdit(card.id, editTitle, editor.getHTML());
+    }
+    if (setEditMode) setEditMode(false);
+  };
+
   return (
     <div
       ref={cardRef}
@@ -98,38 +116,37 @@ const BoardCard = ({
       {editMode ? (
         <div className="flex flex-col gap-1 h-full min-h-[180px]">
           <input
-            className="border border-gray-300 rounded-md px-2 py-1 mb-1 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+            className="border rounded-md px-2 py-1 mb-1 focus:ring-2 focus:ring-blue-200 focus:outline-none transition border-gray-300"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
             disabled={isEditing}
-            required
             autoFocus
             placeholder={titlePlaceholder}
           />
           <div
-            className="prose prose-sm border border-gray-300 rounded-md px-2 py-1 mb-1 min-h-[80px] bg-white text-left flex-1 relative focus-within:ring-2 focus-within:ring-blue-200 focus-within:border-blue-400 focus-within:border-2 focus-within:outline-none focus-within:outline-0 transition"
+            className="prose prose-sm border rounded-md px-2 py-1 mb-1 min-h-[80px] bg-white text-left flex-1 relative focus-within:ring-2 focus-within:ring-blue-200 focus-within:border-blue-400 focus-within:border-2 focus-within:outline-none focus-within:outline-0 transition border-gray-300"
             tabIndex={0}
             style={{ outline: 'none', boxShadow: 'none', padding: 0 }}
           >
             <EditorContent
               editor={editor}
-              style={{ outline: 'none', boxShadow: 'none' }} // 移除 inline padding，統一用 CSS 控制
+              style={{ outline: 'none', boxShadow: 'none' }}
               {...(editMode ? { onPointerDown: (e) => e.stopPropagation() } : {})}
             />
-            {/* 只在內容區為空時顯示 placeholder，且不影響清單外觀 */}
             {contentPlaceholder && !editor?.getText().trim() && editMode && (
               <div className="absolute left-2 top-1 text-gray-300 pointer-events-none select-none z-10">
                 {contentPlaceholder}
               </div>
             )}
           </div>
-          <div className="mt-auto pt-1 flex gap-2">
+          <div className="mt-auto pt-1 flex gap-2 items-center">
             <MenuBar
               editor={editor}
-              isTempCard={isTempCard}
               isDeleting={isDeleting}
-              onCancel={handleCancel}
+              isTempCard={isTempCard}
               onDelete={handleDelete}
+              onSave={handleSave}
+              onCancel={isTempCard ? handleCancel : () => setEditMode && setEditMode(false)}
             />
           </div>
         </div>

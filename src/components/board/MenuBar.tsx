@@ -1,16 +1,23 @@
-import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered, MdCancel } from 'react-icons/md';
+import {
+  MdFormatBold,
+  MdFormatListBulleted,
+  MdFormatListNumbered,
+  MdCancel,
+  MdCheckCircle,
+} from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Editor } from '@tiptap/react';
 
 interface MenuBarProps {
   editor: Editor | null;
-  isTempCard: boolean;
   isDeleting?: boolean;
   onCancel?: () => void;
   onDelete?: () => void;
+  onSave?: () => void;
+  isTempCard?: boolean;
 }
 
-const MenuBar = ({ editor, isTempCard, isDeleting, onCancel, onDelete }: MenuBarProps) => (
+const MenuBar = ({ editor, isDeleting, onCancel, onDelete, onSave, isTempCard }: MenuBarProps) => (
   <div className="flex gap-1 items-center w-full justify-between">
     <div className="flex gap-1">
       <button
@@ -41,31 +48,46 @@ const MenuBar = ({ editor, isTempCard, isDeleting, onCancel, onDelete }: MenuBar
         <MdFormatListNumbered />
       </button>
     </div>
-    {isTempCard ? (
+    <div className="flex gap-1 items-center">
       <button
         type="button"
-        className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
+        className="text-green-500 hover:text-green-600 transition-colors p-1 outline-none focus-visible:outline-green-400 focus-visible:rounded border-none shadow-none"
         style={{ boxShadow: 'none', border: 'none' }}
-        onClick={onCancel}
+        onClick={onSave}
         disabled={isDeleting}
-        title="取消新增卡片"
-        aria-label="取消新增卡片"
+        title="儲存卡片"
+        aria-label="儲存卡片"
       >
-        <MdCancel size={22} />
+        <MdCheckCircle size={22} />
       </button>
-    ) : (
-      <button
-        type="button"
-        className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
-        style={{ boxShadow: 'none', border: 'none' }}
-        onClick={onDelete}
-        disabled={isDeleting}
-        title="刪除卡片"
-        aria-label="刪除卡片"
-      >
-        <FaRegTrashAlt size={20} />
-      </button>
-    )}
+      {onCancel && (
+        <button
+          type="button"
+          className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
+          style={{ boxShadow: 'none', border: 'none' }}
+          onClick={onCancel}
+          disabled={isDeleting}
+          title="取消編輯"
+          aria-label="取消編輯"
+        >
+          <MdCancel size={22} />
+        </button>
+      )}
+      {/* 僅非暫存卡片才顯示刪除按鈕 */}
+      {onDelete && !isTempCard && (
+        <button
+          type="button"
+          className="text-gray-400 hover:text-red-600 transition-colors p-1 outline-none focus-visible:outline-blue-400 focus-visible:rounded border-none shadow-none"
+          style={{ boxShadow: 'none', border: 'none' }}
+          onClick={onDelete}
+          disabled={isDeleting}
+          title="刪除卡片"
+          aria-label="刪除卡片"
+        >
+          <FaRegTrashAlt size={20} />
+        </button>
+      )}
+    </div>
   </div>
 );
 

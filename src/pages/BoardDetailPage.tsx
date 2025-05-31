@@ -108,7 +108,10 @@ const BoardDetailPage = () => {
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={lists.map((l) => l.id)} strategy={horizontalListSortingStrategy}>
+            <SortableContext
+              items={lists.map((l) => l.id)}
+              strategy={horizontalListSortingStrategy}
+            >
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 {lists.map((list) => (
                   <SortableListItem

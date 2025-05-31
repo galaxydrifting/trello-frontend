@@ -12,6 +12,8 @@ import { useBoardDnD } from '../hooks/useBoardDnD';
 import { useBoardMutations } from '../hooks/useBoardMutations';
 import { useBoardListsState } from '../hooks/useBoardListsState';
 import { v4 as uuidv4 } from 'uuid';
+import Loading from '../components/common/Loading';
+import ErrorMessage from '../components/common/ErrorMessage';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -175,8 +177,8 @@ const BoardDetailPage = () => {
     );
   };
 
-  if (isLoading) return <div>載入中...</div>;
-  if (isError || !board) return <div>無法取得看板資料</div>;
+  if (isLoading) return <Loading />;
+  if (isError || !board) return <ErrorMessage message="無法取得看板資料" />;
 
   return (
     <div className="p-4">

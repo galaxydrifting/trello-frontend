@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import BoardList from '../BoardList';
+import { BoardEditContext } from '../../../hooks/BoardEditContext';
 import { vi } from 'vitest';
 
 describe('BoardList', () => {
@@ -20,15 +21,31 @@ describe('BoardList', () => {
     ],
   };
 
+  const renderWithContext = (ui: React.ReactElement) =>
+    render(
+      <BoardEditContext.Provider
+        value={{
+          editingListId: null,
+          setEditingListId: vi.fn(),
+          editingCardId: null,
+          setEditingCardId: vi.fn(),
+        }}
+      >
+        {ui}
+      </BoardEditContext.Provider>
+    );
+
   it('renders list name and cards', () => {
-    render(<BoardList list={list} />);
+    renderWithContext(<BoardList list={list} />);
     expect(screen.getByText('List 1')).toBeInTheDocument();
     expect(screen.getByText('Card 1')).toBeInTheDocument();
   });
 
   it('calls onEdit when list name edited', () => {
     const onEdit = vi.fn();
-    render(<BoardList list={list} isListEditing setIsListEditing={() => {}} onEdit={onEdit} />);
+    renderWithContext(
+      <BoardList list={list} isListEditing setIsListEditing={() => {}} onEdit={onEdit} />
+    );
     const input = screen.getByDisplayValue('List 1');
     fireEvent.change(input, { target: { value: 'New List' } });
     fireEvent.blur(input);
@@ -37,7 +54,7 @@ describe('BoardList', () => {
 
   it('calls onDelete when delete button clicked', () => {
     const onDelete = vi.fn();
-    render(<BoardList list={list} onDelete={onDelete} />);
+    renderWithContext(<BoardList list={list} onDelete={onDelete} />);
     const deleteBtn = screen.getByLabelText('刪除清單');
     fireEvent.click(deleteBtn);
     // 彈窗出現後，點擊確定刪除

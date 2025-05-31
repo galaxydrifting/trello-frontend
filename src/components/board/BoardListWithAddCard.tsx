@@ -32,12 +32,9 @@ const BoardListWithAddCard = ({
   onDeleteCard,
   isEditingCard,
   isDeletingCard,
-  editingCardId,
-  setEditingCardId,
 }: BoardListWithAddCardProps) => {
-  // 透過 context 取得 editingListId 與 setEditingListId
-  const { editingListId, setEditingListId } = useBoardEditContext();
-  const [editingCardIdState, setEditingCardIdState] = useState<string | null>(null);
+  // 透過 context 取得 editingListId, setEditingListId
+  const { editingListId, setEditingListId, setEditingCardId } = useBoardEditContext();
   const [tempCard, setTempCard] = useState<null | import('./types').Card>(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -52,7 +49,8 @@ const BoardListWithAddCard = ({
       listId: list.id,
       boardId: list.boardId,
     });
-    setEditingCardIdState(tempId);
+    setEditingListId(null); // 確保不會有清單在編輯
+    setEditingCardId(tempId); // 直接呼叫，不用 setTimeout
     setIsAdding(true);
   };
 
@@ -61,7 +59,7 @@ const BoardListWithAddCard = ({
     if (tempCard && id === tempCard.id) {
       onAddCard(list.id, title, content);
       setTempCard(null);
-      setEditingCardIdState(null);
+      setEditingListId(null);
       setIsAdding(false);
     } else if (onEditCard) {
       onEditCard(id, title, content);
@@ -71,7 +69,7 @@ const BoardListWithAddCard = ({
   const handleCancelTempCard = (id: string) => {
     if (tempCard && id === tempCard.id) {
       setTempCard(null);
-      setEditingCardIdState(null);
+      setEditingListId(null);
       setIsAdding(false);
     }
   };
@@ -92,8 +90,6 @@ const BoardListWithAddCard = ({
         isDeletingCard={isDeletingCard}
         isListEditing={editingListId === list.id}
         setIsListEditing={(v: boolean) => setEditingListId(v ? list.id : null)}
-        editingCardId={editingCardId ?? editingCardIdState}
-        setEditingCardId={setEditingCardId ?? setEditingCardIdState}
         disableCardDrag={!!(editingListId === list.id)}
         onAddCard={handleAddCardClick}
         tempCardId={tempCard?.id}

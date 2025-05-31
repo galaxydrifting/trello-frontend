@@ -3,6 +3,8 @@ import { createContext, useContext } from 'react';
 interface BoardEditContextProps {
   editingListId: string | null;
   setEditingListId: (id: string | null) => void;
+  editingCardId: string | null;
+  setEditingCardId: (id: string | null) => void;
 }
 
 export const BoardEditContext = createContext<BoardEditContextProps | undefined>(undefined);

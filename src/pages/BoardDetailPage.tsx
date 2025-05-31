@@ -15,7 +15,6 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import { useBoardActions } from '../hooks/useBoardActions';
 import { BoardEditContext } from '../hooks/BoardEditContext';
 import { useBoardEditContextValue } from '../hooks/useBoardEditContextValue';
-import { useBoardEditState } from '../hooks/useBoardEditState';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -88,7 +87,6 @@ const BoardDetailPage = () => {
 
   // 集中管理所有清單與卡片的編輯狀態（改用自訂 hook）
   const boardEditContextValue = useBoardEditContextValue();
-  const { editingCardId, setEditingCardId } = useBoardEditState();
 
   if (isLoading) return <Loading />;
   if (isError || !board) return <ErrorMessage message="無法取得看板資料" />;
@@ -117,7 +115,10 @@ const BoardDetailPage = () => {
                   <SortableListItem
                     key={list.id}
                     id={list.id}
-                    disabled={boardEditContextValue.editingListId === list.id || !!editingCardId}
+                    disabled={
+                      boardEditContextValue.editingListId === list.id ||
+                      !!boardEditContextValue.editingCardId
+                    }
                   >
                     <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
                       <BoardListWithAddCard
@@ -132,8 +133,6 @@ const BoardDetailPage = () => {
                         onDeleteCard={(id) => handleDeleteCard(list.id, id)}
                         isEditingCard={updateCardMutation.isPending}
                         isDeletingCard={deleteCardMutation.isPending}
-                        editingCardId={editingCardId}
-                        setEditingCardId={setEditingCardId}
                       />
                     </SortableContext>
                   </SortableListItem>

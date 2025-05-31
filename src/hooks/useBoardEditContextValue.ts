@@ -1,7 +1,7 @@
 import { useBoardEditState } from './useBoardEditState';
 
 export const useBoardEditContextValue = () => {
-  const { editingListId, setEditingListId } = useBoardEditState();
+  const { editingListId, setEditingListId, editingCardId, setEditingCardId } = useBoardEditState();
 
-  return { editingListId, setEditingListId };
+  return { editingListId, setEditingListId, editingCardId, setEditingCardId };
 };

@@ -3,6 +3,7 @@ import SortableCardItem from './SortableCardItem';
 import { List } from './types';
 import BoardCard from './BoardCard';
 import { createPortal } from 'react-dom';
+import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardListProps {
   list: List;
@@ -16,8 +17,6 @@ interface BoardListProps {
   isDeletingCard?: boolean;
   isListEditing?: boolean;
   setIsListEditing?: (v: boolean) => void;
-  editingCardId?: string | null;
-  setEditingCardId?: (id: string | null) => void;
   disableCardDrag?: boolean;
   // 新增卡片
   onAddCard?: (listId: string) => void;
@@ -26,25 +25,25 @@ interface BoardListProps {
   onCancelTempCard?: (id: string) => void;
 }
 
-const BoardList = ({
-  list,
-  onEdit,
-  onDelete,
-  isEditing,
-  isDeleting,
-  onEditCard,
-  onDeleteCard,
-  isEditingCard,
-  isDeletingCard,
-  isListEditing,
-  setIsListEditing,
-  editingCardId,
-  setEditingCardId,
-  disableCardDrag = false,
-  onAddCard,
-  tempCardId,
-  onCancelTempCard,
-}: BoardListProps) => {
+const BoardList = (props: BoardListProps) => {
+  const { editingCardId, setEditingCardId } = useBoardEditContext();
+  const {
+    list,
+    onEdit,
+    onDelete,
+    isEditing,
+    isDeleting,
+    onEditCard,
+    onDeleteCard,
+    isEditingCard,
+    isDeletingCard,
+    isListEditing,
+    setIsListEditing,
+    disableCardDrag = false,
+    onAddCard,
+    tempCardId,
+    onCancelTempCard,
+  } = props;
   const [editName, setEditName] = useState(list.name);
   const [showDelete, setShowDelete] = useState(false);
   const editMode = !!isListEditing;
@@ -180,9 +179,7 @@ const BoardList = ({
                   isEditing={isEditingCard}
                   isDeleting={isDeletingCard}
                   editMode={editingCardId === card.id}
-                  setEditMode={(v: boolean) =>
-                    setEditingCardId && setEditingCardId(v ? card.id : null)
-                  }
+                  setEditMode={(v: boolean) => setEditingCardId(v ? card.id : null)}
                   {...(tempCardId === card.id
                     ? { onCancel: () => onCancelTempCard && onCancelTempCard(card.id) }
                     : {})}

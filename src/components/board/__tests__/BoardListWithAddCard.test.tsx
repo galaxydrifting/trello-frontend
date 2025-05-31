@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import BoardListWithAddCard from '../BoardListWithAddCard';
 import { vi } from 'vitest';
@@ -14,7 +15,14 @@ describe('BoardListWithAddCard', () => {
 
   it('renders list and add card button', () => {
     render(
-      <BoardEditContext.Provider value={{ editingListId: null, setEditingListId: vi.fn() }}>
+      <BoardEditContext.Provider
+        value={{
+          editingListId: null,
+          setEditingListId: vi.fn(),
+          editingCardId: null,
+          setEditingCardId: vi.fn(),
+        }}
+      >
         <BoardListWithAddCard list={list} onAddCard={vi.fn()} isPending={false} />
       </BoardEditContext.Provider>
     );
@@ -26,7 +34,14 @@ describe('BoardListWithAddCard', () => {
   it('calls onAddCard when add card is triggered', () => {
     const onAddCard = vi.fn();
     render(
-      <BoardEditContext.Provider value={{ editingListId: null, setEditingListId: vi.fn() }}>
+      <BoardEditContext.Provider
+        value={{
+          editingListId: null,
+          setEditingListId: vi.fn(),
+          editingCardId: null,
+          setEditingCardId: vi.fn(),
+        }}
+      >
         <BoardListWithAddCard list={list} onAddCard={onAddCard} isPending={false} />
       </BoardEditContext.Provider>
     );
@@ -44,10 +59,22 @@ describe('BoardListWithAddCard', () => {
       cards: [],
     };
     const mockOnAddCard = vi.fn();
+    // 用 useState 模擬 context 狀態
+    const Wrapper = ({ children }: { children: React.ReactNode }) => {
+      const [editingCardId, setEditingCardId] = React.useState<string | null>(null);
+      const [editingListId, setEditingListId] = React.useState<string | null>(null);
+      return (
+        <BoardEditContext.Provider
+          value={{ editingListId, setEditingListId, editingCardId, setEditingCardId }}
+        >
+          {children}
+        </BoardEditContext.Provider>
+      );
+    };
     render(
-      <BoardEditContext.Provider value={{ editingListId: null, setEditingListId: vi.fn() }}>
+      <Wrapper>
         <BoardListWithAddCard list={mockList} onAddCard={mockOnAddCard} isPending={false} />
-      </BoardEditContext.Provider>
+      </Wrapper>
     );
     // 取得新增卡片按鈕
     const addButton = screen.getByLabelText('新增卡片');

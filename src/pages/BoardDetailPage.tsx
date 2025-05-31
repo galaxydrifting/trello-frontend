@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { Board } from '../components/board/types';
 import AddListForm from '../components/board/AddListForm';
 import BoardListWithAddCard from '../components/board/BoardListWithAddCard';
@@ -14,6 +13,7 @@ import { useBoardListsState } from '../hooks/useBoardListsState';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { useBoardActions } from '../hooks/useBoardActions';
+import { useBoardEditState } from '../hooks/useBoardEditState';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -84,12 +84,8 @@ const BoardDetailPage = () => {
     })
   );
 
-  // 集中管理所有清單與卡片的編輯狀態
-  const [editingListId, setEditingListId] = useState<string | null>(null);
-  const [editingCardId, setEditingCardId] = useState<string | null>(null);
-
-  // 只允許同時一個清單或一張卡片進入編輯模式
-  const canEdit = !editingListId && !editingCardId;
+  // 集中管理所有清單與卡片的編輯狀態（改用自訂 hook）
+  const { editingListId, setEditingListId, editingCardId, setEditingCardId } = useBoardEditState();
 
   if (isLoading) return <Loading />;
   if (isError || !board) return <ErrorMessage message="無法取得看板資料" />;
@@ -130,15 +126,9 @@ const BoardDetailPage = () => {
                       isEditingCard={updateCardMutation.isPending}
                       isDeletingCard={deleteCardMutation.isPending}
                       isListEditing={editingListId === list.id}
-                      setIsListEditing={(v: boolean) => {
-                        if (v && canEdit) setEditingListId(list.id);
-                        if (!v) setEditingListId(null);
-                      }}
+                      setIsListEditing={(v: boolean) => setEditingListId(v ? list.id : null)}
                       editingCardId={editingCardId}
-                      setEditingCardId={(id) => {
-                        if (id && canEdit) setEditingCardId(id);
-                        if (!id) setEditingCardId(null);
-                      }}
+                      setEditingCardId={setEditingCardId}
                     />
                   </SortableContext>
                 </SortableListItem>

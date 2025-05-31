@@ -11,9 +11,9 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { useBoardDnD } from '../hooks/useBoardDnD';
 import { useBoardMutations } from '../hooks/useBoardMutations';
 import { useBoardListsState } from '../hooks/useBoardListsState';
-import { v4 as uuidv4 } from 'uuid';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
+import { useBoardActions } from '../hooks/useBoardActions';
 
 const BoardDetailPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -42,6 +42,28 @@ const BoardDetailPage = () => {
   // 使用自訂 hook 管理 lists 與 localCards 狀態
   const { lists, setLists, localCards, setLocalCards } = useBoardListsState(board);
 
+  // 將 mutation handler 集中於 useBoardActions
+  const {
+    handleAddList,
+    handleAddCard,
+    handleDeleteCard,
+    handleDeleteList,
+    handleEditList,
+    handleEditCard,
+  } = useBoardActions({
+    boardId: boardId!,
+    lists,
+    setLists,
+    setLocalCards,
+    createListMutation: createListMutation.mutate,
+    createCardMutation: createCardMutation.mutate,
+    updateListMutation: updateListMutation.mutate,
+    deleteListMutation: deleteListMutation.mutate,
+    updateCardMutation: updateCardMutation.mutate,
+    deleteCardMutation: deleteCardMutation.mutate,
+    queryClient,
+  });
+
   const { handleDragStart, handleDragOver, handleDragEnd } = useBoardDnD({
     lists,
     setLists,
@@ -68,114 +90,6 @@ const BoardDetailPage = () => {
 
   // 只允許同時一個清單或一張卡片進入編輯模式
   const canEdit = !editingListId && !editingCardId;
-
-  const handleAddList = (name: string) => {
-    const tempId = 'temp-' + uuidv4();
-    // 修正：補齊 List 介面所需欄位
-    const optimisticList = {
-      id: tempId,
-      name,
-      boardId: boardId!,
-      position: lists.length > 0 ? Math.max(...lists.map((l) => l.position)) + 1 : 1,
-      cards: [],
-    };
-    setLists((prev) => [...prev, optimisticList]);
-    createListMutation.mutate(name, {
-      onSuccess: (data) => {
-        // 確保回傳的 list 也有 cards: []
-        setLists((prev) => prev.map((l) => (l.id === tempId ? { ...data, cards: [] } : l)));
-      },
-      onError: () => {
-        setLists((prev) => prev.filter((l) => l.id !== tempId));
-      },
-    });
-  };
-
-  // 新增卡片（樂觀更新）
-  const handleAddCard = (listId: string, title: string, content: string) => {
-    const tempId = 'temp-' + uuidv4();
-    // 修正：補齊 Card 介面所需欄位
-    const optimisticCard = {
-      id: tempId,
-      title,
-      content,
-      position: 0,
-      listId,
-      boardId: boardId!,
-    };
-    setLocalCards((prev) => {
-      const newCards = { ...prev };
-      newCards[listId] = [optimisticCard, ...(newCards[listId] || [])]; // 插入最前面
-      return newCards;
-    });
-    createCardMutation.mutate(
-      { listId, title, content },
-      {
-        onSuccess: (data) => {
-          setLocalCards((prev) => {
-            const newCards = { ...prev };
-            newCards[listId] = (newCards[listId] || []).map((c) => (c.id === tempId ? data : c));
-            return newCards;
-          });
-        },
-        onError: () => {
-          setLocalCards((prev) => {
-            const newCards = { ...prev };
-            newCards[listId] = (newCards[listId] || []).filter((c) => c.id !== tempId);
-            return newCards;
-          });
-        },
-      }
-    );
-  };
-
-  // 刪除卡片（樂觀更新）
-  const handleDeleteCard = (listId: string, cardId: string) => {
-    // 樂觀移除
-    setLocalCards((prev) => {
-      const newCards = { ...prev };
-      newCards[listId] = (newCards[listId] || []).filter((c) => c.id !== cardId);
-      return newCards;
-    });
-    deleteCardMutation.mutate(cardId, {
-      onError: () => {
-        // 若失敗，重新加回卡片（可根據需求調整，這裡簡單 reload）
-        queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-      },
-    });
-  };
-
-  // 刪除清單（樂觀更新）
-  const handleDeleteList = (listId: string) => {
-    // 樂觀移除
-    setLists((prev) => prev.filter((l) => l.id !== listId));
-    setLocalCards((prev) => {
-      const newCards = { ...prev };
-      delete newCards[listId];
-      return newCards;
-    });
-    deleteListMutation.mutate(listId, {
-      onError: () => {
-        // 若失敗，重新加回清單（可根據需求調整，這裡簡單 reload）
-        queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-      },
-    });
-  };
-
-  // 編輯清單名稱（樂觀更新）
-  const handleEditList = (id: string, name: string) => {
-    // 先本地更新 lists
-    setLists((prev) => prev.map((l) => (l.id === id ? { ...l, name } : l)));
-    updateListMutation.mutate(
-      { id, name },
-      {
-        onError: () => {
-          // 若失敗，回復原本名稱（重新 fetch）
-          queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-        },
-      }
-    );
-  };
 
   if (isLoading) return <Loading />;
   if (isError || !board) return <ErrorMessage message="無法取得看板資料" />;
@@ -211,18 +125,7 @@ const BoardDetailPage = () => {
                       onDeleteList={handleDeleteList}
                       isEditingList={updateListMutation.isPending}
                       isDeletingList={deleteListMutation.isPending}
-                      onEditCard={(id, title, content) => {
-                        setLocalCards((prev) => {
-                          const newCards = { ...prev };
-                          for (const listId in newCards) {
-                            newCards[listId] = newCards[listId].map((c) =>
-                              c.id === id ? { ...c, title, content } : c
-                            );
-                          }
-                          return newCards;
-                        });
-                        updateCardMutation.mutate({ id, title, content });
-                      }}
+                      onEditCard={handleEditCard}
                       onDeleteCard={(id) => handleDeleteCard(list.id, id)}
                       isEditingCard={updateCardMutation.isPending}
                       isDeletingCard={deleteCardMutation.isPending}

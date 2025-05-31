@@ -34,6 +34,14 @@ vi.mock('../../hooks/useBoardListsState', () => ({
     setLocalCards: vi.fn(),
   }),
 }));
+vi.mock('../../components/board/BoardListWithAddCard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="board-list-with-add-card" />,
+}));
+vi.mock('../../components/board/AddListForm', () => ({
+  __esModule: true,
+  default: () => <div data-testid="add-list-form" />,
+}));
 
 const renderWithProviders = (ui: React.ReactElement, { route = '/board/1' } = {}) => {
   const queryClient = new QueryClient();
@@ -100,5 +108,39 @@ describe('BoardDetailPage', () => {
     renderWithProviders(<BoardDetailPage />);
     expect(screen.getByText('Demo Board')).toBeInTheDocument();
     expect(screen.getByText('尚無清單')).toBeInTheDocument();
+  });
+
+  it('有清單時正確渲染 BoardListWithAddCard', async () => {
+    // mock lists 有資料
+    vi.doMock('../../hooks/useBoardListsState', () => ({
+      useBoardListsState: () => ({
+        lists: [
+          { id: 'l1', name: '清單1', boardId: '1', position: 1, cards: [] },
+          { id: 'l2', name: '清單2', boardId: '1', position: 2, cards: [] },
+        ],
+        setLists: vi.fn(),
+        localCards: {},
+        setLocalCards: vi.fn(),
+      }),
+    }));
+    vi.doMock('@tanstack/react-query', async () => {
+      const actual =
+        await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');
+      return {
+        ...actual,
+        useQuery: () => ({
+          isLoading: false,
+          isError: false,
+          data: { id: '1', name: 'Demo Board', lists: [] },
+        }),
+      };
+    });
+    // 重新 import 以套用 mock
+    const { default: BoardDetailPage } = await import('../BoardDetailPage');
+    renderWithProviders(<BoardDetailPage />);
+    // 應該會有兩個 BoardListWithAddCard
+    expect(screen.getAllByTestId('board-list-with-add-card').length).toBe(2);
+    // AddListForm 仍然存在
+    expect(screen.getByTestId('add-list-form')).toBeInTheDocument();
   });
 });

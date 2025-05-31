@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import BoardList from './BoardList';
 import { List } from './types';
+import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardListWithAddCardProps {
   list: List;
@@ -15,8 +16,6 @@ interface BoardListWithAddCardProps {
   onDeleteCard?: (id: string) => void;
   isEditingCard?: boolean;
   isDeletingCard?: boolean;
-  isListEditing?: boolean;
-  setIsListEditing?: (v: boolean) => void;
   editingCardId?: string | null;
   setEditingCardId?: (id: string | null) => void;
 }
@@ -33,12 +32,11 @@ const BoardListWithAddCard = ({
   onDeleteCard,
   isEditingCard,
   isDeletingCard,
-  isListEditing,
-  setIsListEditing,
   editingCardId,
   setEditingCardId,
 }: BoardListWithAddCardProps) => {
-  const [isListEditingState, setIsListEditingState] = useState(false);
+  // 透過 context 取得 editingListId 與 setEditingListId
+  const { editingListId, setEditingListId } = useBoardEditContext();
   const [editingCardIdState, setEditingCardIdState] = useState<string | null>(null);
   const [tempCard, setTempCard] = useState<null | import('./types').Card>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -92,11 +90,11 @@ const BoardListWithAddCard = ({
         isDeleting={isDeletingList}
         isEditingCard={isEditingCard}
         isDeletingCard={isDeletingCard}
-        isListEditing={isListEditing ?? isListEditingState}
-        setIsListEditing={setIsListEditing ?? setIsListEditingState}
+        isListEditing={editingListId === list.id}
+        setIsListEditing={(v: boolean) => setEditingListId(v ? list.id : null)}
         editingCardId={editingCardId ?? editingCardIdState}
         setEditingCardId={setEditingCardId ?? setEditingCardIdState}
-        disableCardDrag={!!(isListEditing ?? isListEditingState)}
+        disableCardDrag={!!(editingListId === list.id)}
         onAddCard={handleAddCardClick}
         tempCardId={tempCard?.id}
         onCancelTempCard={handleCancelTempCard}

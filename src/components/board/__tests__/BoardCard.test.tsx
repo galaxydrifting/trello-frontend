@@ -12,6 +12,9 @@ const mockContextValue = {
   isDeletingList: false,
   isEditingCard: false,
   isDeletingCard: false,
+  onAddList: vi.fn(),
+  onEditList: vi.fn(),
+  onDeleteList: vi.fn(),
 };
 
 describe('BoardCard', () => {

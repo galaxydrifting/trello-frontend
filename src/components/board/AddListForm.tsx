@@ -1,17 +1,18 @@
 import { useState } from 'react';
+import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface AddListFormProps {
-  onAdd: (name: string) => void;
   isPending: boolean;
 }
 
-const AddListForm = ({ onAdd, isPending }: AddListFormProps) => {
+const AddListForm = ({ isPending }: AddListFormProps) => {
   const [name, setName] = useState('');
+  const { onAddList } = useBoardEditContext();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd(name.trim());
+    onAddList(name.trim());
     setName('');
   };
 

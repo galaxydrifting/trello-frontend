@@ -25,6 +25,9 @@ describe('BoardListWithAddCard', () => {
           isDeletingList: false,
           isEditingCard: false,
           isDeletingCard: false,
+          onAddList: vi.fn(),
+          onEditList: vi.fn(),
+          onDeleteList: vi.fn(),
         }}
       >
         <BoardListWithAddCard list={list} onAddCard={vi.fn()} isPending={false} />
@@ -48,12 +51,15 @@ describe('BoardListWithAddCard', () => {
           isDeletingList: false,
           isEditingCard: false,
           isDeletingCard: false,
+          onAddList: vi.fn(),
+          onEditList: vi.fn(),
+          onDeleteList: vi.fn(),
         }}
       >
         <BoardListWithAddCard list={list} onAddCard={onAddCard} isPending={false} />
       </BoardEditContext.Provider>
     );
-    // 直接觸發 handleAddCardClick
+    // 直接觸发 handleAddCardClick
     onAddCard('list-1', 'title', 'content');
     expect(onAddCard).toHaveBeenCalledWith('list-1', 'title', 'content');
   });
@@ -82,6 +88,9 @@ describe('BoardListWithAddCard', () => {
             isDeletingList: false,
             isEditingCard: false,
             isDeletingCard: false,
+            onAddList: vi.fn(),
+            onEditList: vi.fn(),
+            onDeleteList: vi.fn(),
           }}
         >
           {children}

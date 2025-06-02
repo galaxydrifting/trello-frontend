@@ -7,26 +7,20 @@ import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardListProps {
   list: List;
-  onEdit?: (id: string, name: string) => void;
-  onDelete?: (id: string) => void;
   onEditCard?: (id: string, title: string, content: string) => void;
   onDeleteCard?: (id: string) => void;
   isListEditing?: boolean;
   setIsListEditing?: (v: boolean) => void;
   disableCardDrag?: boolean;
-  // 新增卡片
   onAddCard?: (listId: string) => void;
-  // 新增
   tempCardId?: string | null;
   onCancelTempCard?: (id: string) => void;
 }
 
 const BoardList = (props: BoardListProps) => {
-  const { editingCardId, setEditingCardId, isEditingList, isDeletingList } = useBoardEditContext();
+  const { editingCardId, setEditingCardId, isEditingList, isDeletingList, onEditList, onDeleteList } = useBoardEditContext();
   const {
     list,
-    onEdit,
-    onDelete,
     onEditCard,
     onDeleteCard,
     isListEditing,
@@ -51,9 +45,9 @@ const BoardList = (props: BoardListProps) => {
 
   // 失焦時自動儲存
   const handleBlur = () => {
-    if (onEdit && editName.trim() && editName !== list.name) {
-      setEditName(editName.trim()); // 立即本地更新
-      onEdit(list.id, editName.trim());
+    if (onEditList && editName.trim() && editName !== list.name) {
+      setEditName(editName.trim());
+      onEditList(list.id, editName.trim());
     }
     setEditMode(false);
   };
@@ -125,9 +119,9 @@ const BoardList = (props: BoardListProps) => {
           className="flex gap-2 mb-2"
           onSubmit={(e) => {
             e.preventDefault();
-            if (onEdit && editName.trim() && editName !== list.name) {
-              setEditName(editName.trim()); // 立即本地更新
-              onEdit(list.id, editName.trim());
+            if (onEditList && editName.trim() && editName !== list.name) {
+              setEditName(editName.trim());
+              onEditList(list.id, editName.trim());
             }
             setEditMode(false);
           }}
@@ -198,7 +192,7 @@ const BoardList = (props: BoardListProps) => {
                 <button
                   className="px-3 py-1 bg-red-600 text-white rounded"
                   onClick={() => {
-                    if (onDelete) onDelete(list.id);
+                    if (onDeleteList) onDeleteList(list.id);
                     setShowDelete(false);
                   }}
                   disabled={isDeletingList}

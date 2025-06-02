@@ -9,6 +9,10 @@ interface BoardEditContextProps {
   isDeletingList: boolean;
   isEditingCard: boolean;
   isDeletingCard: boolean;
+  // 新增：清單操作 handler
+  onAddList: (name: string) => void;
+  onEditList: (id: string, name: string) => void;
+  onDeleteList: (id: string) => void;
 }
 
 export const BoardEditContext = createContext<BoardEditContextProps | undefined>(undefined);
@@ -20,3 +24,5 @@ export const useBoardEditContext = () => {
   }
   return context;
 };
+
+export type { BoardEditContextProps };

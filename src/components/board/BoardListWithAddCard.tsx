@@ -8,8 +8,6 @@ interface BoardListWithAddCardProps {
   list: List;
   onAddCard: (listId: string, title: string, content: string) => void;
   isPending: boolean;
-  onEditList?: (id: string, name: string) => void;
-  onDeleteList?: (id: string) => void;
   onEditCard?: (id: string, title: string, content: string) => void;
   onDeleteCard?: (id: string) => void;
 }
@@ -18,12 +16,9 @@ const BoardListWithAddCard = ({
   list,
   onAddCard,
   isPending,
-  onEditList,
-  onDeleteList,
   onEditCard,
   onDeleteCard,
 }: BoardListWithAddCardProps) => {
-  // 透過 context 取得 editingListId, setEditingListId
   const { editingListId, setEditingListId, setEditingCardId } = useBoardEditContext();
   const [tempCard, setTempCard] = useState<null | import('./types').Card>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -70,8 +65,6 @@ const BoardListWithAddCard = ({
     <div className="min-w-[260px]">
       <BoardList
         list={{ ...list, cards }}
-        onEdit={onEditList}
-        onDelete={onDeleteList}
         onEditCard={handleSaveTempCard}
         onDeleteCard={onDeleteCard}
         isListEditing={editingListId === list.id}

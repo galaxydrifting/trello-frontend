@@ -9,12 +9,8 @@ interface BoardListProps {
   list: List;
   onEdit?: (id: string, name: string) => void;
   onDelete?: (id: string) => void;
-  isEditing?: boolean;
-  isDeleting?: boolean;
   onEditCard?: (id: string, title: string, content: string) => void;
   onDeleteCard?: (id: string) => void;
-  isEditingCard?: boolean;
-  isDeletingCard?: boolean;
   isListEditing?: boolean;
   setIsListEditing?: (v: boolean) => void;
   disableCardDrag?: boolean;
@@ -26,17 +22,13 @@ interface BoardListProps {
 }
 
 const BoardList = (props: BoardListProps) => {
-  const { editingCardId, setEditingCardId } = useBoardEditContext();
+  const { editingCardId, setEditingCardId, isEditingList, isDeletingList } = useBoardEditContext();
   const {
     list,
     onEdit,
     onDelete,
-    isEditing,
-    isDeleting,
     onEditCard,
     onDeleteCard,
-    isEditingCard,
-    isDeletingCard,
     isListEditing,
     setIsListEditing,
     disableCardDrag = false,
@@ -89,7 +81,7 @@ const BoardList = (props: BoardListProps) => {
             tabIndex={0}
             style={{ boxShadow: 'none', border: 'none', outline: 'none' }}
             onClick={() => setShowDelete(true)}
-            disabled={isDeleting}
+            disabled={isDeletingList}
             title="刪除清單"
             aria-label="刪除清單"
           >
@@ -146,7 +138,7 @@ const BoardList = (props: BoardListProps) => {
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             onBlur={handleBlur}
-            disabled={isEditing}
+            disabled={isEditingList}
             autoFocus
           />
         </form>
@@ -176,8 +168,6 @@ const BoardList = (props: BoardListProps) => {
                   card={card}
                   onEdit={onEditCard}
                   onDelete={onDeleteCard}
-                  isEditing={isEditingCard}
-                  isDeleting={isDeletingCard}
                   editMode={editingCardId === card.id}
                   setEditMode={(v: boolean) => setEditingCardId(v ? card.id : null)}
                   {...(tempCardId === card.id
@@ -201,7 +191,7 @@ const BoardList = (props: BoardListProps) => {
                 <button
                   className="px-3 py-1 bg-gray-200 rounded"
                   onClick={() => setShowDelete(false)}
-                  disabled={isDeleting}
+                  disabled={isDeletingList}
                 >
                   取消
                 </button>
@@ -211,7 +201,7 @@ const BoardList = (props: BoardListProps) => {
                     if (onDelete) onDelete(list.id);
                     setShowDelete(false);
                   }}
-                  disabled={isDeleting}
+                  disabled={isDeletingList}
                 >
                   確定刪除
                 </button>

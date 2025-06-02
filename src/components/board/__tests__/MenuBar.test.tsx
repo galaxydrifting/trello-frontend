@@ -1,9 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import MenuBar from '../MenuBar';
 import { vi } from 'vitest';
+import type { Editor } from '@tiptap/react';
 
 // Mock editor
-const mockEditor = {
+const mockEditor: Editor = {
   chain: () => ({
     focus: () => ({
       toggleBold: () => ({ run: vi.fn() }),
@@ -11,7 +12,7 @@ const mockEditor = {
       toggleOrderedList: () => ({ run: vi.fn() }),
     }),
   }),
-};
+} as unknown as Editor;
 
 describe('MenuBar', () => {
   it('顯示儲存、取消、刪除（既有卡片編輯模式）', () => {
@@ -20,8 +21,7 @@ describe('MenuBar', () => {
     const onDelete = vi.fn();
     render(
       <MenuBar
-        editor={mockEditor as any}
-        isEditingMode
+        editor={mockEditor}
         isDeleting={false}
         onSave={onSave}
         onCancel={onCancel}
@@ -39,8 +39,7 @@ describe('MenuBar', () => {
     const onCancel = vi.fn();
     render(
       <MenuBar
-        editor={mockEditor as any}
-        isEditingMode
+        editor={mockEditor}
         isDeleting={false}
         onSave={onSave}
         onCancel={onCancel}
@@ -58,8 +57,7 @@ describe('MenuBar', () => {
     const onDelete = vi.fn();
     render(
       <MenuBar
-        editor={mockEditor as any}
-        isEditingMode
+        editor={mockEditor}
         isDeleting={false}
         onSave={onSave}
         onCancel={onCancel}

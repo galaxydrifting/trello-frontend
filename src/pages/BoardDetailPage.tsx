@@ -86,7 +86,12 @@ const BoardDetailPage = () => {
   );
 
   // 集中管理所有清單與卡片的編輯狀態（改用自訂 hook）
-  const boardEditContextValue = useBoardEditContextValue();
+  const boardEditContextValue = useBoardEditContextValue({
+    isEditingList: updateListMutation.isPending,
+    isDeletingList: deleteListMutation.isPending,
+    isEditingCard: updateCardMutation.isPending,
+    isDeletingCard: deleteCardMutation.isPending,
+  });
 
   if (isLoading) return <Loading />;
   if (isError || !board) return <ErrorMessage message="無法取得看板資料" />;
@@ -127,12 +132,8 @@ const BoardDetailPage = () => {
                         isPending={createCardMutation.isPending}
                         onEditList={handleEditList}
                         onDeleteList={handleDeleteList}
-                        isEditingList={updateListMutation.isPending}
-                        isDeletingList={deleteListMutation.isPending}
                         onEditCard={handleEditCard}
                         onDeleteCard={(id) => handleDeleteCard(list.id, id)}
-                        isEditingCard={updateCardMutation.isPending}
-                        isDeletingCard={deleteCardMutation.isPending}
                       />
                     </SortableContext>
                   </SortableListItem>

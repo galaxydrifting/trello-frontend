@@ -3,16 +3,14 @@ import { Card } from './types';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import MenuBar from './MenuBar';
+import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardCardProps {
   card: Card;
   onEdit?: (id: string, title: string, content: string) => void;
   onDelete?: (id: string) => void;
-  isEditing?: boolean;
-  isDeleting?: boolean;
   editMode?: boolean;
   setEditMode?: (v: boolean) => void;
-  // 新增
   onCancel?: () => void;
   titlePlaceholder?: string;
   contentPlaceholder?: string;
@@ -22,14 +20,13 @@ const BoardCard = ({
   card,
   onEdit,
   onDelete,
-  isEditing,
-  isDeleting,
   editMode = false,
   setEditMode,
   onCancel,
   titlePlaceholder,
   contentPlaceholder,
 }: BoardCardProps) => {
+  const { isEditingCard, isDeletingCard } = useBoardEditContext();
   const [editTitle, setEditTitle] = useState(card.title);
   const [isBlurring, setIsBlurring] = useState(false); // 防止重複觸發
   const cardRef = useRef<HTMLDivElement>(null);
@@ -119,7 +116,7 @@ const BoardCard = ({
             className="border rounded-md px-2 py-1 mb-1 focus:ring-2 focus:ring-blue-200 focus:outline-none transition border-gray-300"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
-            disabled={isEditing}
+            disabled={isEditingCard}
             autoFocus
             placeholder={titlePlaceholder}
           />
@@ -142,7 +139,7 @@ const BoardCard = ({
           <div className="mt-auto pt-1 flex gap-2 items-center">
             <MenuBar
               editor={editor}
-              isDeleting={isDeleting}
+              isDeleting={isDeletingCard}
               isTempCard={isTempCard}
               onDelete={handleDelete}
               onSave={handleSave}

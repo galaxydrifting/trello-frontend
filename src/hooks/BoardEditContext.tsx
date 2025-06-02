@@ -5,6 +5,10 @@ interface BoardEditContextProps {
   setEditingListId: (id: string | null) => void;
   editingCardId: string | null;
   setEditingCardId: (id: string | null) => void;
+  isEditingList: boolean;
+  isDeletingList: boolean;
+  isEditingCard: boolean;
+  isDeletingCard: boolean;
 }
 
 export const BoardEditContext = createContext<BoardEditContextProps | undefined>(undefined);

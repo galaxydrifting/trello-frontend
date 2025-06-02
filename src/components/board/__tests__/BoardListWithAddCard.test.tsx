@@ -21,6 +21,10 @@ describe('BoardListWithAddCard', () => {
           setEditingListId: vi.fn(),
           editingCardId: null,
           setEditingCardId: vi.fn(),
+          isEditingList: false,
+          isDeletingList: false,
+          isEditingCard: false,
+          isDeletingCard: false,
         }}
       >
         <BoardListWithAddCard list={list} onAddCard={vi.fn()} isPending={false} />
@@ -40,6 +44,10 @@ describe('BoardListWithAddCard', () => {
           setEditingListId: vi.fn(),
           editingCardId: null,
           setEditingCardId: vi.fn(),
+          isEditingList: false,
+          isDeletingList: false,
+          isEditingCard: false,
+          isDeletingCard: false,
         }}
       >
         <BoardListWithAddCard list={list} onAddCard={onAddCard} isPending={false} />
@@ -65,7 +73,16 @@ describe('BoardListWithAddCard', () => {
       const [editingListId, setEditingListId] = React.useState<string | null>(null);
       return (
         <BoardEditContext.Provider
-          value={{ editingListId, setEditingListId, editingCardId, setEditingCardId }}
+          value={{
+            editingListId,
+            setEditingListId,
+            editingCardId,
+            setEditingCardId,
+            isEditingList: false,
+            isDeletingList: false,
+            isEditingCard: false,
+            isDeletingCard: false,
+          }}
         >
           {children}
         </BoardEditContext.Provider>

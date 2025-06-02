@@ -29,6 +29,10 @@ describe('BoardList', () => {
           setEditingListId: vi.fn(),
           editingCardId: null,
           setEditingCardId: vi.fn(),
+          isEditingList: false,
+          isDeletingList: false,
+          isEditingCard: false,
+          isDeletingCard: false,
         }}
       >
         {ui}

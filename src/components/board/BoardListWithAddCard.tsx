@@ -10,14 +10,8 @@ interface BoardListWithAddCardProps {
   isPending: boolean;
   onEditList?: (id: string, name: string) => void;
   onDeleteList?: (id: string) => void;
-  isEditingList?: boolean;
-  isDeletingList?: boolean;
   onEditCard?: (id: string, title: string, content: string) => void;
   onDeleteCard?: (id: string) => void;
-  isEditingCard?: boolean;
-  isDeletingCard?: boolean;
-  editingCardId?: string | null;
-  setEditingCardId?: (id: string | null) => void;
 }
 
 const BoardListWithAddCard = ({
@@ -26,12 +20,8 @@ const BoardListWithAddCard = ({
   isPending,
   onEditList,
   onDeleteList,
-  isEditingList,
-  isDeletingList,
   onEditCard,
   onDeleteCard,
-  isEditingCard,
-  isDeletingCard,
 }: BoardListWithAddCardProps) => {
   // 透過 context 取得 editingListId, setEditingListId
   const { editingListId, setEditingListId, setEditingCardId } = useBoardEditContext();
@@ -84,10 +74,6 @@ const BoardListWithAddCard = ({
         onDelete={onDeleteList}
         onEditCard={handleSaveTempCard}
         onDeleteCard={onDeleteCard}
-        isEditing={isEditingList}
-        isDeleting={isDeletingList}
-        isEditingCard={isEditingCard}
-        isDeletingCard={isDeletingCard}
         isListEditing={editingListId === list.id}
         setIsListEditing={(v: boolean) => setEditingListId(v ? list.id : null)}
         disableCardDrag={!!(editingListId === list.id)}

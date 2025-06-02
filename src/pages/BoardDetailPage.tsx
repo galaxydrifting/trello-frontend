@@ -94,6 +94,9 @@ const BoardDetailPage = () => {
     onAddList: handleAddList,
     onEditList: handleEditList,
     onDeleteList: handleDeleteList,
+    onAddCard: handleAddCard,
+    onEditCard: handleEditCard,
+    onDeleteCard: handleDeleteCard,
   });
 
   if (isLoading) return <Loading />;
@@ -131,10 +134,7 @@ const BoardDetailPage = () => {
                     <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
                       <BoardListWithAddCard
                         list={{ ...list, cards: localCards[list.id] || list.cards }}
-                        onAddCard={handleAddCard}
                         isPending={createCardMutation.isPending}
-                        onEditCard={handleEditCard}
-                        onDeleteCard={(id) => handleDeleteCard(list.id, id)}
                       />
                     </SortableContext>
                   </SortableListItem>

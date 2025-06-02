@@ -7,12 +7,11 @@ import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardListProps {
   list: List;
-  onEditCard?: (id: string, title: string, content: string) => void;
-  onDeleteCard?: (id: string) => void;
   isListEditing?: boolean;
   setIsListEditing?: (v: boolean) => void;
   disableCardDrag?: boolean;
   onAddCard?: (listId: string) => void;
+  onEditCard?: (id: string, title: string, content: string) => void;
   tempCardId?: string | null;
   onCancelTempCard?: (id: string) => void;
 }
@@ -28,12 +27,11 @@ const BoardList = (props: BoardListProps) => {
   } = useBoardEditContext();
   const {
     list,
-    onEditCard,
-    onDeleteCard,
     isListEditing,
     setIsListEditing,
     disableCardDrag = false,
     onAddCard,
+    onEditCard,
     tempCardId,
     onCancelTempCard,
   } = props;
@@ -167,12 +165,10 @@ const BoardList = (props: BoardListProps) => {
               >
                 <BoardCard
                   card={card}
-                  onEdit={onEditCard}
-                  onDelete={onDeleteCard}
                   editMode={editingCardId === card.id}
                   setEditMode={(v: boolean) => setEditingCardId(v ? card.id : null)}
-                  {...(tempCardId === card.id
-                    ? { onCancel: () => onCancelTempCard && onCancelTempCard(card.id) }
+                  {...(tempCardId === card.id && onEditCard
+                    ? { onCancel: () => onCancelTempCard && onCancelTempCard(card.id), onEditCard }
                     : {})}
                   {...(tempCardId === card.id
                     ? { titlePlaceholder: '輸入卡片標題', contentPlaceholder: '輸入卡片內容' }

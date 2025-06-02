@@ -19,6 +19,9 @@ describe('AddListForm', () => {
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
+          onAddCard: vi.fn(),
+          onEditCard: vi.fn(),
+          onDeleteCard: vi.fn(),
         }}
       >
         <AddListForm isPending={false} />
@@ -44,6 +47,9 @@ describe('AddListForm', () => {
           onAddList: onAdd,
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
+          onAddCard: vi.fn(),
+          onEditCard: vi.fn(),
+          onDeleteCard: vi.fn(),
         }}
       >
         <AddListForm isPending={false} />

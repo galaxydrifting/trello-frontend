@@ -28,9 +28,12 @@ describe('BoardListWithAddCard', () => {
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
+          onAddCard: vi.fn(),
+          onEditCard: vi.fn(),
+          onDeleteCard: vi.fn(),
         }}
       >
-        <BoardListWithAddCard list={list} onAddCard={vi.fn()} isPending={false} />
+        <BoardListWithAddCard list={list} isPending={false} />
       </BoardEditContext.Provider>
     );
     expect(screen.getByText('List 1')).toBeInTheDocument();
@@ -54,12 +57,15 @@ describe('BoardListWithAddCard', () => {
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
+          onAddCard,
+          onEditCard: vi.fn(),
+          onDeleteCard: vi.fn(),
         }}
       >
-        <BoardListWithAddCard list={list} onAddCard={onAddCard} isPending={false} />
+        <BoardListWithAddCard list={list} isPending={false} />
       </BoardEditContext.Provider>
     );
-    // 直接觸发 handleAddCardClick
+    // 直接觸發 context 的 onAddCard
     onAddCard('list-1', 'title', 'content');
     expect(onAddCard).toHaveBeenCalledWith('list-1', 'title', 'content');
   });
@@ -72,7 +78,6 @@ describe('BoardListWithAddCard', () => {
       position: 1,
       cards: [],
     };
-    const mockOnAddCard = vi.fn();
     // 用 useState 模擬 context 狀態
     const Wrapper = ({ children }: { children: React.ReactNode }) => {
       const [editingCardId, setEditingCardId] = React.useState<string | null>(null);
@@ -91,6 +96,9 @@ describe('BoardListWithAddCard', () => {
             onAddList: vi.fn(),
             onEditList: vi.fn(),
             onDeleteList: vi.fn(),
+            onAddCard: vi.fn(),
+            onEditCard: vi.fn(),
+            onDeleteCard: vi.fn(),
           }}
         >
           {children}
@@ -99,7 +107,7 @@ describe('BoardListWithAddCard', () => {
     };
     render(
       <Wrapper>
-        <BoardListWithAddCard list={mockList} onAddCard={mockOnAddCard} isPending={false} />
+        <BoardListWithAddCard list={mockList} isPending={false} />
       </Wrapper>
     );
     // 取得新增卡片按鈕

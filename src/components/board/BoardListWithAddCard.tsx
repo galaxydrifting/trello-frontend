@@ -6,20 +6,11 @@ import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardListWithAddCardProps {
   list: List;
-  onAddCard: (listId: string, title: string, content: string) => void;
   isPending: boolean;
-  onEditCard?: (id: string, title: string, content: string) => void;
-  onDeleteCard?: (id: string) => void;
 }
 
-const BoardListWithAddCard = ({
-  list,
-  onAddCard,
-  isPending,
-  onEditCard,
-  onDeleteCard,
-}: BoardListWithAddCardProps) => {
-  const { editingListId, setEditingListId, setEditingCardId } = useBoardEditContext();
+const BoardListWithAddCard = ({ list, isPending }: BoardListWithAddCardProps) => {
+  const { editingListId, setEditingListId, setEditingCardId, onAddCard } = useBoardEditContext();
   const [tempCard, setTempCard] = useState<null | import('./types').Card>(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -39,15 +30,13 @@ const BoardListWithAddCard = ({
     setIsAdding(true);
   };
 
+  // 無論內容是否為空都要送出
   const handleSaveTempCard = (id: string, title: string, content: string) => {
     if (tempCard && id === tempCard.id) {
-      // 允許空白標題與內容，直接呼叫 onAddCard
       onAddCard(list.id, title, content);
       setTempCard(null);
       setEditingListId(null);
       setIsAdding(false);
-    } else if (onEditCard) {
-      onEditCard(id, title, content);
     }
   };
 
@@ -65,12 +54,11 @@ const BoardListWithAddCard = ({
     <div className="min-w-[260px]">
       <BoardList
         list={{ ...list, cards }}
-        onEditCard={handleSaveTempCard}
-        onDeleteCard={onDeleteCard}
         isListEditing={editingListId === list.id}
         setIsListEditing={(v: boolean) => setEditingListId(v ? list.id : null)}
         disableCardDrag={!!(editingListId === list.id)}
         onAddCard={handleAddCardClick}
+        onEditCard={handleSaveTempCard}
         tempCardId={tempCard?.id}
         onCancelTempCard={handleCancelTempCard}
       />

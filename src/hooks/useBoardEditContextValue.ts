@@ -9,6 +9,10 @@ interface BoardEditContextValueOptions {
   onAddList: (name: string) => void;
   onEditList: (id: string, name: string) => void;
   onDeleteList: (id: string) => void;
+  // 新增：卡片操作 handler
+  onAddCard: (listId: string, title: string, content: string) => void;
+  onEditCard: (id: string, title: string, content: string) => void;
+  onDeleteCard: (listId: string, cardId: string) => void;
 }
 
 export const useBoardEditContextValue = (options: BoardEditContextValueOptions) => {
@@ -26,5 +30,9 @@ export const useBoardEditContextValue = (options: BoardEditContextValueOptions) 
     onAddList: options.onAddList,
     onEditList: options.onEditList,
     onDeleteList: options.onDeleteList,
+    // 新增
+    onAddCard: options.onAddCard,
+    onEditCard: options.onEditCard,
+    onDeleteCard: options.onDeleteCard,
   };
 };

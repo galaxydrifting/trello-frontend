@@ -7,26 +7,29 @@ import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardCardProps {
   card: Card;
-  onEdit?: (id: string, title: string, content: string) => void;
-  onDelete?: (id: string) => void;
   editMode?: boolean;
   setEditMode?: (v: boolean) => void;
   onCancel?: () => void;
   titlePlaceholder?: string;
   contentPlaceholder?: string;
+  onEditCard?: (id: string, title: string, content: string) => void;
 }
 
 const BoardCard = ({
   card,
-  onEdit,
-  onDelete,
   editMode = false,
   setEditMode,
   onCancel,
   titlePlaceholder,
   contentPlaceholder,
+  onEditCard,
 }: BoardCardProps) => {
-  const { isEditingCard, isDeletingCard } = useBoardEditContext();
+  const {
+    isEditingCard,
+    isDeletingCard,
+    onEditCard: contextOnEditCard,
+    onDeleteCard,
+  } = useBoardEditContext();
   const [editTitle, setEditTitle] = useState(card.title);
   const [isBlurring, setIsBlurring] = useState(false); // 防止重複觸發
   const cardRef = useRef<HTMLDivElement>(null);
@@ -65,15 +68,15 @@ const BoardCard = ({
       if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
         if (!isBlurring) {
           setIsBlurring(true);
-          if (onEdit && editor) {
-            await onEdit(card.id, editTitle, editor.getHTML());
+          if ((onEditCard || contextOnEditCard) && editor) {
+            await (onEditCard || contextOnEditCard)?.(card.id, editTitle, editor.getHTML());
           }
           setIsBlurring(false);
           if (setEditMode) setEditMode(false);
         }
       }
     },
-    [cardRef, isBlurring, onEdit, editTitle, editor, card.id, setEditMode]
+    [cardRef, isBlurring, onEditCard, contextOnEditCard, editTitle, editor, card.id, setEditMode]
   );
 
   // MenuBar 事件也用 useCallback 包裝
@@ -83,14 +86,14 @@ const BoardCard = ({
   }, [onCancel, setEditMode]);
 
   const handleDelete = useCallback(async () => {
-    if (onDelete) await onDelete(card.id);
+    if (onDeleteCard) await onDeleteCard(card.listId, card.id);
     if (setEditMode) setEditMode(false);
-  }, [onDelete, card.id, setEditMode]);
+  }, [onDeleteCard, card.listId, card.id, setEditMode]);
 
   // 儲存按鈕事件
   const handleSave = async () => {
-    if (onEdit && editor) {
-      await onEdit(card.id, editTitle, editor.getHTML());
+    if (onEditCard && editor) {
+      await onEditCard(card.id, editTitle, editor.getHTML());
     }
     if (setEditMode) setEditMode(false);
   };

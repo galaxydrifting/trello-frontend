@@ -37,6 +37,9 @@ describe('BoardList', () => {
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
+          onAddCard: vi.fn(),
+          onEditCard: vi.fn(),
+          onDeleteCard: vi.fn(),
           ...ctx,
         }}
       >

@@ -13,6 +13,10 @@ interface BoardEditContextProps {
   onAddList: (name: string) => void;
   onEditList: (id: string, name: string) => void;
   onDeleteList: (id: string) => void;
+  // 新增：卡片操作 handler
+  onAddCard: (listId: string, title: string, content: string) => void;
+  onEditCard: (id: string, title: string, content: string) => void;
+  onDeleteCard: (listId: string, cardId: string) => void;
 }
 
 export const BoardEditContext = createContext<BoardEditContextProps | undefined>(undefined);

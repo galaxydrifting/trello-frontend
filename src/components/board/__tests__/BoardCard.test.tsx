@@ -15,6 +15,9 @@ const mockContextValue = {
   onAddList: vi.fn(),
   onEditList: vi.fn(),
   onDeleteList: vi.fn(),
+  onAddCard: vi.fn(),
+  onEditCard: vi.fn(),
+  onDeleteCard: vi.fn(),
 };
 
 describe('BoardCard', () => {
@@ -38,14 +41,13 @@ describe('BoardCard', () => {
   });
 
   it('calls onEdit when blur in edit mode', async () => {
-    const onEdit = vi.fn();
+    const onEditCard = vi.fn();
     render(
-      <BoardEditContext.Provider value={mockContextValue}>
+      <BoardEditContext.Provider value={{ ...mockContextValue, onEditCard }}>
         <BoardCard
           card={baseCard}
           editMode
           setEditMode={() => {}}
-          onEdit={onEdit}
           titlePlaceholder="輸入卡片標題"
         />
       </BoardEditContext.Provider>
@@ -53,19 +55,19 @@ describe('BoardCard', () => {
     const input = screen.getByPlaceholderText('輸入卡片標題');
     fireEvent.change(input, { target: { value: 'New Title' } });
     fireEvent.blur(input);
-    expect(onEdit).toHaveBeenCalled();
+    expect(onEditCard).toHaveBeenCalled();
   });
 
   it('calls onDelete when delete button clicked', () => {
-    const onDelete = vi.fn();
+    const onDeleteCard = vi.fn();
     render(
-      <BoardEditContext.Provider value={mockContextValue}>
-        <BoardCard card={baseCard} editMode setEditMode={() => {}} onDelete={onDelete} />
+      <BoardEditContext.Provider value={{ ...mockContextValue, onDeleteCard }}>
+        <BoardCard card={baseCard} editMode setEditMode={() => {}} />
       </BoardEditContext.Provider>
     );
     // 觸發 MenuBar 的刪除
-    // 這裡僅測試 onDelete 是否可呼叫
-    onDelete('card-1');
-    expect(onDelete).toHaveBeenCalledWith('card-1');
+    // 這裡僅測試 onDeleteCard 是否可呼叫
+    onDeleteCard('list-1', 'card-1');
+    expect(onDeleteCard).toHaveBeenCalledWith('list-1', 'card-1');
   });
 });

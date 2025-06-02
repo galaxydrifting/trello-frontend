@@ -52,9 +52,9 @@ describe('BoardList', () => {
 
   it('calls onEdit when list name edited', () => {
     const onEdit = vi.fn();
-    renderWithContext(
-      <BoardList list={list} isListEditing setIsListEditing={() => {}} />, { onEditList: onEdit }
-    );
+    renderWithContext(<BoardList list={list} isListEditing setIsListEditing={() => {}} />, {
+      onEditList: onEdit,
+    });
     const input = screen.getByDisplayValue('List 1');
     fireEvent.change(input, { target: { value: 'New List' } });
     fireEvent.blur(input);

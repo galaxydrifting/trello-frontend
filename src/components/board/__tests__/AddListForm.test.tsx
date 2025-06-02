@@ -6,19 +6,21 @@ import { BoardEditContext } from '../../../hooks/BoardEditContext';
 describe('AddListForm', () => {
   it('renders input and button', () => {
     render(
-      <BoardEditContext.Provider value={{
-        editingListId: null,
-        setEditingListId: vi.fn(),
-        editingCardId: null,
-        setEditingCardId: vi.fn(),
-        isEditingList: false,
-        isDeletingList: false,
-        isEditingCard: false,
-        isDeletingCard: false,
-        onAddList: vi.fn(),
-        onEditList: vi.fn(),
-        onDeleteList: vi.fn(),
-      }}>
+      <BoardEditContext.Provider
+        value={{
+          editingListId: null,
+          setEditingListId: vi.fn(),
+          editingCardId: null,
+          setEditingCardId: vi.fn(),
+          isEditingList: false,
+          isDeletingList: false,
+          isEditingCard: false,
+          isDeletingCard: false,
+          onAddList: vi.fn(),
+          onEditList: vi.fn(),
+          onDeleteList: vi.fn(),
+        }}
+      >
         <AddListForm isPending={false} />
       </BoardEditContext.Provider>
     );
@@ -29,19 +31,21 @@ describe('AddListForm', () => {
   it('calls onAdd when form submitted', () => {
     const onAdd = vi.fn();
     render(
-      <BoardEditContext.Provider value={{
-        editingListId: null,
-        setEditingListId: vi.fn(),
-        editingCardId: null,
-        setEditingCardId: vi.fn(),
-        isEditingList: false,
-        isDeletingList: false,
-        isEditingCard: false,
-        isDeletingCard: false,
-        onAddList: onAdd,
-        onEditList: vi.fn(),
-        onDeleteList: vi.fn(),
-      }}>
+      <BoardEditContext.Provider
+        value={{
+          editingListId: null,
+          setEditingListId: vi.fn(),
+          editingCardId: null,
+          setEditingCardId: vi.fn(),
+          isEditingList: false,
+          isDeletingList: false,
+          isEditingCard: false,
+          isDeletingCard: false,
+          onAddList: onAdd,
+          onEditList: vi.fn(),
+          onDeleteList: vi.fn(),
+        }}
+      >
         <AddListForm isPending={false} />
       </BoardEditContext.Provider>
     );

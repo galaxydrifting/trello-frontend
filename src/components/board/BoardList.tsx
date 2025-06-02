@@ -18,7 +18,14 @@ interface BoardListProps {
 }
 
 const BoardList = (props: BoardListProps) => {
-  const { editingCardId, setEditingCardId, isEditingList, isDeletingList, onEditList, onDeleteList } = useBoardEditContext();
+  const {
+    editingCardId,
+    setEditingCardId,
+    isEditingList,
+    isDeletingList,
+    onEditList,
+    onDeleteList,
+  } = useBoardEditContext();
   const {
     list,
     onEditCard,

@@ -5,6 +5,8 @@ interface BoardEditContextValueOptions {
   isDeletingList: boolean;
   isEditingCard: boolean;
   isDeletingCard: boolean;
+  isCreatingList: boolean; // 新增
+  isCreatingCard: boolean; // 新增
   // 新增：清單操作 handler
   onAddList: (name: string) => void;
   onEditList: (id: string, name: string) => void;
@@ -27,10 +29,11 @@ export const useBoardEditContextValue = (options: BoardEditContextValueOptions) 
     isDeletingList: options.isDeletingList,
     isEditingCard: options.isEditingCard,
     isDeletingCard: options.isDeletingCard,
+    isCreatingList: options.isCreatingList, // 新增
+    isCreatingCard: options.isCreatingCard, // 新增
     onAddList: options.onAddList,
     onEditList: options.onEditList,
     onDeleteList: options.onDeleteList,
-    // 新增
     onAddCard: options.onAddCard,
     onEditCard: options.onEditCard,
     onDeleteCard: options.onDeleteCard,

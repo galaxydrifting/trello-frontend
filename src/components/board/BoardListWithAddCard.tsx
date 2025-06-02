@@ -6,16 +6,16 @@ import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
 interface BoardListWithAddCardProps {
   list: List;
-  isPending: boolean;
 }
 
-const BoardListWithAddCard = ({ list, isPending }: BoardListWithAddCardProps) => {
-  const { editingListId, setEditingListId, setEditingCardId, onAddCard } = useBoardEditContext();
+const BoardListWithAddCard = ({ list }: BoardListWithAddCardProps) => {
+  const { editingListId, setEditingListId, setEditingCardId, onAddCard, isCreatingCard } =
+    useBoardEditContext();
   const [tempCard, setTempCard] = useState<null | import('./types').Card>(null);
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddCardClick = () => {
-    if (isPending || isAdding) return;
+    if (isCreatingCard || isAdding) return;
     const tempId = 'temp-' + uuidv4();
     setTempCard({
       id: tempId,

@@ -1,13 +1,9 @@
 import { useState } from 'react';
 import { useBoardEditContext } from '../../hooks/BoardEditContext';
 
-interface AddListFormProps {
-  isPending: boolean;
-}
-
-const AddListForm = ({ isPending }: AddListFormProps) => {
+const AddListForm = () => {
   const [name, setName] = useState('');
-  const { onAddList } = useBoardEditContext();
+  const { onAddList, isCreatingList } = useBoardEditContext();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,14 +20,14 @@ const AddListForm = ({ isPending }: AddListFormProps) => {
         placeholder="輸入新清單名稱"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        disabled={isPending}
+        disabled={isCreatingList}
       />
       <button
         type="submit"
         className="bg-indigo-600 text-white px-4 py-1 rounded disabled:bg-indigo-300"
-        disabled={isPending || !name.trim()}
+        disabled={isCreatingList || !name.trim()}
       >
-        {isPending ? '新增中...' : '新增清單'}
+        {isCreatingList ? '新增中...' : '新增清單'}
       </button>
     </form>
   );

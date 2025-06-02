@@ -9,6 +9,8 @@ interface BoardEditContextProps {
   isDeletingList: boolean;
   isEditingCard: boolean;
   isDeletingCard: boolean;
+  isCreatingList: boolean; // 新增
+  isCreatingCard: boolean; // 新增
   // 新增：清單操作 handler
   onAddList: (name: string) => void;
   onEditList: (id: string, name: string) => void;

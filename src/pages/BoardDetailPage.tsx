@@ -91,6 +91,8 @@ const BoardDetailPage = () => {
     isDeletingList: deleteListMutation.isPending,
     isEditingCard: updateCardMutation.isPending,
     isDeletingCard: deleteCardMutation.isPending,
+    isCreatingList: createListMutation.isPending, // 新增
+    isCreatingCard: createCardMutation.isPending, // 新增
     onAddList: handleAddList,
     onEditList: handleEditList,
     onDeleteList: handleDeleteList,
@@ -106,7 +108,7 @@ const BoardDetailPage = () => {
     <BoardEditContext.Provider value={boardEditContextValue}>
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
-        <AddListForm isPending={createListMutation.isPending} />
+        <AddListForm />
         {lists.length === 0 ? (
           <div className="text-gray-400 text-center py-8">尚無清單</div>
         ) : (
@@ -134,7 +136,6 @@ const BoardDetailPage = () => {
                     <SortableContext items={(localCards[list.id] || list.cards).map((c) => c.id)}>
                       <BoardListWithAddCard
                         list={{ ...list, cards: localCards[list.id] || list.cards }}
-                        isPending={createCardMutation.isPending}
                       />
                     </SortableContext>
                   </SortableListItem>

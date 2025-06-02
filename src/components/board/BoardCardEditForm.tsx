@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import MenuBar from './MenuBar';
@@ -50,31 +50,30 @@ const BoardCardEditForm = ({
   }, [card.title, card.content]);
 
   // 失焦時直接儲存
-  const handleCardBlur = useCallback(
-    async (e: React.FocusEvent<HTMLDivElement>) => {
-      if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
-        if (!isBlurring) {
-          setIsBlurring(true);
-          if ((onEditCard || contextOnEditCard) && editor) {
-            await (onEditCard || contextOnEditCard)?.(card.id, editTitle, editor.getHTML());
-          }
-          setIsBlurring(false);
-          if (setEditMode) setEditMode(false);
+  const handleCardBlur = async (e: React.FocusEvent<HTMLDivElement>) => {
+    if (cardRef.current && !cardRef.current.contains(e.relatedTarget as Node)) {
+      if (!isBlurring) {
+        setIsBlurring(true);
+        if ((onEditCard || contextOnEditCard) && editor) {
+          await (onEditCard || contextOnEditCard)?.(card.id, editTitle, editor.getHTML());
         }
+        setIsBlurring(false);
+        if (setEditMode) setEditMode(false);
       }
-    },
-    [cardRef, isBlurring, onEditCard, contextOnEditCard, editTitle, editor, card.id, setEditMode]
-  );
+    }
+  };
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     if (onCancel) onCancel();
     if (setEditMode) setEditMode(false);
-  }, [onCancel, setEditMode]);
+  };
 
-  const handleDelete = useCallback(async () => {
-    if (onDeleteCard) await onDeleteCard(card.listId, card.id);
+  const handleDelete = async () => {
+    if (onDeleteCard) {
+      await onDeleteCard(card.listId, card.id);
+    }
     if (setEditMode) setEditMode(false);
-  }, [onDeleteCard, card.listId, card.id, setEditMode]);
+  };
 
   const handleSave = async () => {
     if (onEditCard && editor) {

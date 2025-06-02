@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Board } from './types';
 import { FaRegEdit, FaRegTrashAlt } from 'react-icons/fa';
 import { createPortal } from 'react-dom';
+import DeleteBoardModal from './DeleteBoardModal';
 
 type BoardListItemProps = {
   board: Board;
@@ -94,30 +95,16 @@ const BoardListItem = ({
       )}
       {showDelete &&
         createPortal(
-          <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white p-4 rounded shadow">
-              <div className="mb-2">確定要刪除「{board.name}」嗎？</div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  className="px-3 py-1 bg-gray-200 rounded"
-                  onClick={() => setShowDelete(false)}
-                  disabled={isDeleting}
-                >
-                  取消
-                </button>
-                <button
-                  className="px-3 py-1 bg-red-600 text-white rounded"
-                  onClick={() => {
-                    if (onDelete) onDelete(board.id);
-                    setShowDelete(false);
-                  }}
-                  disabled={isDeleting}
-                >
-                  確定刪除
-                </button>
-              </div>
-            </div>
-          </div>,
+          <DeleteBoardModal
+            boardName={board.name}
+            isOpen={showDelete}
+            isDeleting={isDeleting}
+            onCancel={() => setShowDelete(false)}
+            onConfirm={() => {
+              if (onDelete) onDelete(board.id);
+              setShowDelete(false);
+            }}
+          />,
           document.body
         )}
     </li>

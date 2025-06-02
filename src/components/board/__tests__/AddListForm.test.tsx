@@ -16,6 +16,8 @@ describe('AddListForm', () => {
           isDeletingList: false,
           isEditingCard: false,
           isDeletingCard: false,
+          isCreatingList: false,
+          isCreatingCard: false,
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
@@ -24,7 +26,7 @@ describe('AddListForm', () => {
           onDeleteCard: vi.fn(),
         }}
       >
-        <AddListForm isPending={false} />
+        <AddListForm />
       </BoardEditContext.Provider>
     );
     expect(screen.getByPlaceholderText('輸入新清單名稱')).toBeInTheDocument();
@@ -44,6 +46,8 @@ describe('AddListForm', () => {
           isDeletingList: false,
           isEditingCard: false,
           isDeletingCard: false,
+          isCreatingList: false,
+          isCreatingCard: false,
           onAddList: onAdd,
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
@@ -52,7 +56,7 @@ describe('AddListForm', () => {
           onDeleteCard: vi.fn(),
         }}
       >
-        <AddListForm isPending={false} />
+        <AddListForm />
       </BoardEditContext.Provider>
     );
     const input = screen.getByPlaceholderText('輸入新清單名稱');

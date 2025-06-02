@@ -12,6 +12,8 @@ const mockContextValue = {
   isDeletingList: false,
   isEditingCard: false,
   isDeletingCard: false,
+  isCreatingList: false, // 新增
+  isCreatingCard: false, // 新增
   onAddList: vi.fn(),
   onEditList: vi.fn(),
   onDeleteList: vi.fn(),
@@ -43,7 +45,9 @@ describe('BoardCard', () => {
   it('calls onEdit when blur in edit mode', async () => {
     const onEditCard = vi.fn();
     render(
-      <BoardEditContext.Provider value={{ ...mockContextValue, onEditCard }}>
+      <BoardEditContext.Provider
+        value={{ ...mockContextValue, onEditCard, isCreatingList: false, isCreatingCard: false }}
+      >
         <BoardCard
           card={baseCard}
           editMode
@@ -61,7 +65,9 @@ describe('BoardCard', () => {
   it('calls onDelete when delete button clicked', () => {
     const onDeleteCard = vi.fn();
     render(
-      <BoardEditContext.Provider value={{ ...mockContextValue, onDeleteCard }}>
+      <BoardEditContext.Provider
+        value={{ ...mockContextValue, onDeleteCard, isCreatingList: false, isCreatingCard: false }}
+      >
         <BoardCard card={baseCard} editMode setEditMode={() => {}} />
       </BoardEditContext.Provider>
     );

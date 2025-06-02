@@ -25,6 +25,8 @@ describe('BoardListWithAddCard', () => {
           isDeletingList: false,
           isEditingCard: false,
           isDeletingCard: false,
+          isCreatingList: false,
+          isCreatingCard: false,
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
@@ -33,7 +35,7 @@ describe('BoardListWithAddCard', () => {
           onDeleteCard: vi.fn(),
         }}
       >
-        <BoardListWithAddCard list={list} isPending={false} />
+        <BoardListWithAddCard list={list} />
       </BoardEditContext.Provider>
     );
     expect(screen.getByText('List 1')).toBeInTheDocument();
@@ -54,6 +56,8 @@ describe('BoardListWithAddCard', () => {
           isDeletingList: false,
           isEditingCard: false,
           isDeletingCard: false,
+          isCreatingList: false,
+          isCreatingCard: false,
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),
@@ -62,7 +66,7 @@ describe('BoardListWithAddCard', () => {
           onDeleteCard: vi.fn(),
         }}
       >
-        <BoardListWithAddCard list={list} isPending={false} />
+        <BoardListWithAddCard list={list} />
       </BoardEditContext.Provider>
     );
     // 直接觸發 context 的 onAddCard
@@ -93,6 +97,8 @@ describe('BoardListWithAddCard', () => {
             isDeletingList: false,
             isEditingCard: false,
             isDeletingCard: false,
+            isCreatingList: false,
+            isCreatingCard: false,
             onAddList: vi.fn(),
             onEditList: vi.fn(),
             onDeleteList: vi.fn(),
@@ -107,7 +113,7 @@ describe('BoardListWithAddCard', () => {
     };
     render(
       <Wrapper>
-        <BoardListWithAddCard list={mockList} isPending={false} />
+        <BoardListWithAddCard list={mockList} />
       </Wrapper>
     );
     // 取得新增卡片按鈕

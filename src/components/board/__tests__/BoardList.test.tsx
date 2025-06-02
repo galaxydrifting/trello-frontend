@@ -34,6 +34,8 @@ describe('BoardList', () => {
           isDeletingList: false,
           isEditingCard: false,
           isDeletingCard: false,
+          isCreatingList: false, // 新增
+          isCreatingCard: false, // 新增
           onAddList: vi.fn(),
           onEditList: vi.fn(),
           onDeleteList: vi.fn(),

@@ -4,8 +4,8 @@ import { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core';
 import { Board } from '../components/board/types';
 
 interface UseBoardDnDProps {
-  lists: Board['lists'];
-  setLists: (lists: Board['lists']) => void;
+  localLists: Board['lists'];
+  setLocalLists: (lists: Board['lists']) => void;
   localCards: Record<string, Board['lists'][0]['cards']>;
   setLocalCards: (cards: Record<string, Board['lists'][0]['cards']>) => void;
   moveList: (id: string, newIndex: number) => Promise<void>;
@@ -14,8 +14,8 @@ interface UseBoardDnDProps {
 }
 
 export function useBoardDnD({
-  lists,
-  setLists,
+  localLists,
+  setLocalLists,
   localCards,
   setLocalCards,
   moveList,
@@ -38,7 +38,7 @@ export function useBoardDnD({
 
   const findContainer = (id?: string) => {
     if (!id) return null;
-    if (lists.find((l) => l.id === id)) return id;
+    if (localLists.find((l) => l.id === id)) return id;
     for (const [listId, cards] of Object.entries(localCards)) {
       if (cards.find((c) => c.id === id)) return listId;
     }
@@ -51,7 +51,7 @@ export function useBoardDnD({
     console.log('[DnD] handleDragStart', {
       activeId: active.id,
       container,
-      lists,
+      localLists,
       localCards,
     });
     setActiveId(active.id as string);
@@ -106,18 +106,18 @@ export function useBoardDnD({
       activeContainer,
       eventActiveId: active.id,
       eventOverId: over?.id,
-      lists,
+      localLists,
       localCards,
     });
     if (!over) return;
     // Reorder lists
-    if (lists.find((l) => l.id === active.id) && lists.find((l) => l.id === over.id)) {
-      const oldIndex = lists.findIndex((l) => l.id === active.id);
-      const newIndex = lists.findIndex((l) => l.id === over.id);
+    if (localLists.find((l) => l.id === active.id) && localLists.find((l) => l.id === over.id)) {
+      const oldIndex = localLists.findIndex((l) => l.id === active.id);
+      const newIndex = localLists.findIndex((l) => l.id === over.id);
       if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        const newLists = arrayMove(lists, oldIndex, newIndex);
-        console.log('[DnD] handleDragEnd: setLists', { oldIndex, newIndex, newLists });
-        setLists(newLists); // 樂觀更新 lists
+        const newLists = arrayMove(localLists, oldIndex, newIndex);
+        console.log('[DnD] handleDragEnd: setLocalLists', { oldIndex, newIndex, newLists });
+        setLocalLists(newLists); // 樂觀更新 lists
         await moveList(active.id as string, newIndex);
         debounceInvalidate();
       }

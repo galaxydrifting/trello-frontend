@@ -41,7 +41,7 @@ const BoardDetailPage = () => {
   } = useBoardMutations(boardId);
 
   // 使用自訂 hook 管理 lists 與 localCards 狀態
-  const { lists, setLists, localCards, setLocalCards } = useBoardListsState(board);
+  const { localLists, setLocalLists, localCards, setLocalCards } = useBoardListsState(board);
 
   // 將 mutation handler 集中於 useBoardActions
   const {
@@ -53,8 +53,8 @@ const BoardDetailPage = () => {
     handleEditCard,
   } = useBoardActions({
     boardId: boardId!,
-    lists,
-    setLists,
+    localLists,
+    setLocalLists,
     setLocalCards,
     createListMutation: createListMutation.mutate,
     createCardMutation: createCardMutation.mutate,
@@ -66,8 +66,8 @@ const BoardDetailPage = () => {
   });
 
   const { handleDragStart, handleDragOver, handleDragEnd } = useBoardDnD({
-    lists,
-    setLists,
+    localLists,
+    setLocalLists,
     localCards,
     setLocalCards,
     moveList: async (id, newIndex) => {
@@ -109,7 +109,7 @@ const BoardDetailPage = () => {
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
         <AddListForm />
-        {lists.length === 0 ? (
+        {localLists.length === 0 ? (
           <div className="text-gray-400 text-center py-8">尚無清單</div>
         ) : (
           <DndContext
@@ -120,11 +120,11 @@ const BoardDetailPage = () => {
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={lists.map((l) => l.id)}
+              items={localLists.map((l) => l.id)}
               strategy={horizontalListSortingStrategy}
             >
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                {lists.map((list) => (
+                {localLists.map((list) => (
                   <SortableListItem
                     key={list.id}
                     id={list.id}

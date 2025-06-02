@@ -5,8 +5,8 @@ import { QueryClient } from '@tanstack/react-query';
 
 interface UseBoardActionsProps {
   boardId: string;
-  lists: List[];
-  setLists: React.Dispatch<React.SetStateAction<List[]>>;
+  localLists: List[];
+  setLocalLists: React.Dispatch<React.SetStateAction<List[]>>;
   setLocalCards: React.Dispatch<React.SetStateAction<Record<string, Card[]>>>;
   createListMutation: (
     variables: string,
@@ -28,8 +28,8 @@ interface UseBoardActionsProps {
 
 export const useBoardActions = ({
   boardId,
-  lists,
-  setLists,
+  localLists,
+  setLocalLists,
   setLocalCards,
   createListMutation,
   createCardMutation,
@@ -47,20 +47,20 @@ export const useBoardActions = ({
         id: tempId,
         name,
         boardId,
-        position: lists.length > 0 ? Math.max(...lists.map((l) => l.position)) + 1 : 1,
+        position: localLists.length > 0 ? Math.max(...localLists.map((l) => l.position)) + 1 : 1,
         cards: [],
       };
-      setLists((prev) => [...prev, optimisticList]);
+      setLocalLists((prev) => [...prev, optimisticList]);
       createListMutation(name, {
         onSuccess: (data: List) => {
-          setLists((prev) => prev.map((l) => (l.id === tempId ? { ...data, cards: [] } : l)));
+          setLocalLists((prev) => prev.map((l) => (l.id === tempId ? { ...data, cards: [] } : l)));
         },
         onError: () => {
-          setLists((prev) => prev.filter((l) => l.id !== tempId));
+          setLocalLists((prev) => prev.filter((l) => l.id !== tempId));
         },
       });
     },
-    [boardId, lists, setLists, createListMutation]
+    [boardId, localLists, setLocalLists, createListMutation]
   );
 
   // 新增卡片
@@ -123,7 +123,7 @@ export const useBoardActions = ({
   // 刪除清單
   const handleDeleteList = useCallback(
     (listId: string) => {
-      setLists((prev) => prev.filter((l) => l.id !== listId));
+      setLocalLists((prev) => prev.filter((l) => l.id !== listId));
       setLocalCards((prev) => {
         const newCards = { ...prev };
         delete newCards[listId];
@@ -135,13 +135,13 @@ export const useBoardActions = ({
         },
       });
     },
-    [setLists, setLocalCards, deleteListMutation, queryClient, boardId]
+    [setLocalLists, setLocalCards, deleteListMutation, queryClient, boardId]
   );
 
   // 編輯清單名稱
   const handleEditList = useCallback(
     (id: string, name: string) => {
-      setLists((prev) => prev.map((l) => (l.id === id ? { ...l, name } : l)));
+      setLocalLists((prev) => prev.map((l) => (l.id === id ? { ...l, name } : l)));
       updateListMutation(
         { id, name },
         {
@@ -151,7 +151,7 @@ export const useBoardActions = ({
         }
       );
     },
-    [setLists, updateListMutation, queryClient, boardId]
+    [setLocalLists, updateListMutation, queryClient, boardId]
   );
 
   // 編輯卡片

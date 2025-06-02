@@ -28,8 +28,8 @@ vi.mock('../../hooks/useBoardMutations', () => ({
 }));
 vi.mock('../../hooks/useBoardListsState', () => ({
   useBoardListsState: () => ({
-    lists: [],
-    setLists: vi.fn(),
+    localLists: [],
+    setLocalLists: vi.fn(),
     localCards: {},
     setLocalCards: vi.fn(),
   }),
@@ -114,11 +114,11 @@ describe('BoardDetailPage', () => {
     // mock lists 有資料
     vi.doMock('../../hooks/useBoardListsState', () => ({
       useBoardListsState: () => ({
-        lists: [
+        localLists: [
           { id: 'l1', name: '清單1', boardId: '1', position: 1, cards: [] },
           { id: 'l2', name: '清單2', boardId: '1', position: 2, cards: [] },
         ],
-        setLists: vi.fn(),
+        setLocalLists: vi.fn(),
         localCards: {},
         setLocalCards: vi.fn(),
       }),

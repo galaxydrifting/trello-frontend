@@ -52,7 +52,7 @@ vi.mock('../../hooks/useBoardDnD', () => ({
   }),
 }));
 
-const mockSetLists = vi.fn();
+const mockSetLocalLists = vi.fn();
 const mockSetLocalCards = vi.fn();
 const mockMutate = vi.fn();
 
@@ -68,7 +68,7 @@ vi.mock('../../hooks/useBoardMutations', () => ({
 }));
 vi.mock('../../hooks/useBoardListsState', () => ({
   useBoardListsState: () => ({
-    lists: [
+    localLists: [
       {
         id: 'list-1',
         name: 'List 1',
@@ -86,7 +86,7 @@ vi.mock('../../hooks/useBoardListsState', () => ({
         ],
       },
     ],
-    setLists: mockSetLists,
+    setLocalLists: mockSetLocalLists,
     localCards: {
       'list-1': [
         {
@@ -122,7 +122,7 @@ describe('BoardDetailPage CRUD/Callback', () => {
     vi.clearAllMocks();
   });
 
-  it('呼叫 handleAddList 時會觸發 setLists 及 createListMutation.mutate', async () => {
+  it('呼叫 handleAddList 時會觸發 setLocalLists 及 createListMutation.mutate', async () => {
     const { default: BoardDetailPage } = await import('../BoardDetailPage');
     renderWithProviders(<BoardDetailPage />);
     // 模擬 AddListForm 輸入與送出
@@ -131,7 +131,7 @@ describe('BoardDetailPage CRUD/Callback', () => {
     const addBtn = screen.getByText('新增清單');
     fireEvent.click(addBtn);
     await waitFor(() => {
-      expect(mockSetLists).toHaveBeenCalled();
+      expect(mockSetLocalLists).toHaveBeenCalled();
       expect(mockMutate).toHaveBeenCalled();
     });
   });
@@ -152,7 +152,7 @@ describe('BoardDetailPage CRUD/Callback', () => {
     });
   });
 
-  it('handleEditList 會觸發 setLists 及 updateListMutation.mutate', async () => {
+  it('handleEditList 會觸發 setLocalLists 及 updateListMutation.mutate', async () => {
     const { default: BoardDetailPage } = await import('../BoardDetailPage');
     renderWithProviders(<BoardDetailPage />);
     // 進入編輯模式
@@ -162,7 +162,7 @@ describe('BoardDetailPage CRUD/Callback', () => {
     fireEvent.change(editInput, { target: { value: 'List 1 編輯' } });
     fireEvent.blur(editInput);
     await waitFor(() => {
-      expect(mockSetLists).toHaveBeenCalled();
+      expect(mockSetLocalLists).toHaveBeenCalled();
       expect(mockMutate).toHaveBeenCalled();
     });
   });
@@ -182,7 +182,7 @@ describe('BoardDetailPage CRUD/Callback', () => {
     });
   });
 
-  it('handleDeleteList 會觸發 setLists、setLocalCards 及 deleteListMutation.mutate', async () => {
+  it('handleDeleteList 會觸發 setLocalLists、setLocalCards 及 deleteListMutation.mutate', async () => {
     const { default: BoardDetailPage } = await import('../BoardDetailPage');
     renderWithProviders(<BoardDetailPage />);
     // 模擬 BoardList 刪除清單流程
@@ -192,7 +192,7 @@ describe('BoardDetailPage CRUD/Callback', () => {
     const confirmBtn = screen.getByText('確定刪除');
     fireEvent.click(confirmBtn);
     await waitFor(() => {
-      expect(mockSetLists).toHaveBeenCalled();
+      expect(mockSetLocalLists).toHaveBeenCalled();
       expect(mockSetLocalCards).toHaveBeenCalled();
       expect(mockMutate).toHaveBeenCalled();
     });

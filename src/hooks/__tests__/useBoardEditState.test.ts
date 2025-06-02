@@ -6,25 +6,22 @@ describe('useBoardEditState', () => {
     const { result } = renderHook(() => useBoardEditState());
     expect(result.current.editingListId).toBeNull();
     expect(result.current.editingCardId).toBeNull();
-    expect(result.current.canEdit).toBe(true);
   });
 
-  it('設定 editingListId 後，canEdit 應為 false', () => {
+  it('設定 editingListId 後，編輯狀態應為該清單', () => {
     const { result } = renderHook(() => useBoardEditState());
     act(() => {
       result.current.setEditingListId('list-1');
     });
     expect(result.current.editingListId).toBe('list-1');
-    expect(result.current.canEdit).toBe(false);
   });
 
-  it('設定 editingCardId 後，canEdit 應為 false', () => {
+  it('設定 editingCardId 後，編輯狀態應為該卡片', () => {
     const { result } = renderHook(() => useBoardEditState());
     act(() => {
       result.current.setEditingCardId('card-1');
     });
     expect(result.current.editingCardId).toBe('card-1');
-    expect(result.current.canEdit).toBe(false);
   });
 
   it('同時只能有一個進入編輯模式', () => {

@@ -12,7 +12,6 @@ export const useBoardEditState = () => {
 
   const editingListId = editingTarget?.type === 'list' ? editingTarget.id : null;
   const editingCardId = editingTarget?.type === 'card' ? editingTarget.id : null;
-  const canEdit = editingTarget === null;
 
   const setEditingListId = (v: string | null) => {
     setEditingTarget((prev) => {
@@ -42,6 +41,5 @@ export const useBoardEditState = () => {
     setEditingListId,
     editingCardId,
     setEditingCardId,
-    canEdit,
   };
 };

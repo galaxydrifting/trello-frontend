@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import SortableCardItem from './SortableCardItem';
 import { List } from './types';
 import BoardCard from './BoardCard';
-import { createPortal } from 'react-dom';
 import { useBoardEditContext } from '../../hooks/BoardEditContext';
+import DeleteListModal from './DeleteListModal';
 
 interface BoardListProps {
   list: List;
@@ -179,34 +179,18 @@ const BoardList = (props: BoardListProps) => {
           </ul>
         )}
       </div>
-      {showDelete &&
-        createPortal(
-          <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center z-50 transition-colors">
-            <div className="bg-white p-4 rounded shadow">
-              <div className="mb-2">確定要刪除「{list.name}」嗎？</div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  className="px-3 py-1 bg-gray-200 rounded"
-                  onClick={() => setShowDelete(false)}
-                  disabled={isDeletingList}
-                >
-                  取消
-                </button>
-                <button
-                  className="px-3 py-1 bg-red-600 text-white rounded"
-                  onClick={() => {
-                    if (onDeleteList) onDeleteList(list.id);
-                    setShowDelete(false);
-                  }}
-                  disabled={isDeletingList}
-                >
-                  確定刪除
-                </button>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
+      {showDelete && (
+        <DeleteListModal
+          listName={list.name}
+          open={showDelete}
+          isDeleting={isDeletingList}
+          onCancel={() => setShowDelete(false)}
+          onConfirm={() => {
+            if (onDeleteList) onDeleteList(list.id);
+            setShowDelete(false);
+          }}
+        />
+      )}
     </div>
   );
 };

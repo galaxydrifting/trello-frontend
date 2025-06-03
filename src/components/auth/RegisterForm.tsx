@@ -27,7 +27,9 @@ export const RegisterForm = () => {
     <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <div className="rounded-md shadow-sm -space-y-px">
         <div className="mb-4">
-          <label htmlFor="email" className="sr-only">電子郵件</label>
+          <label htmlFor="email" className="sr-only">
+            電子郵件
+          </label>
           <input
             id="email"
             type="email"
@@ -39,7 +41,9 @@ export const RegisterForm = () => {
           {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email.message}</div>}
         </div>
         <div className="mb-4">
-          <label htmlFor="name" className="sr-only">用戶名稱</label>
+          <label htmlFor="name" className="sr-only">
+            用戶名稱
+          </label>
           <input
             id="name"
             type="text"
@@ -51,7 +55,9 @@ export const RegisterForm = () => {
           {errors.name && <div className="text-red-500 text-xs mt-1">{errors.name.message}</div>}
         </div>
         <div className="mb-4">
-          <label htmlFor="password" className="sr-only">密碼</label>
+          <label htmlFor="password" className="sr-only">
+            密碼
+          </label>
           <input
             id="password"
             type="password"
@@ -60,12 +66,16 @@ export const RegisterForm = () => {
             className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
             placeholder="密碼"
           />
-          {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password.message}</div>}
+          {errors.password && (
+            <div className="text-red-500 text-xs mt-1">{errors.password.message}</div>
+          )}
         </div>
       </div>
       <SubmitButton isPending={registerMutation.isPending} isSuccess={registerMutation.isSuccess} />
       {registerMutation.isError && (
-        <div className="text-red-500 text-xs mt-2">{registerMutation.error?.response?.data?.message || '註冊失敗'}</div>
+        <div className="text-red-500 text-xs mt-2">
+          {registerMutation.error?.response?.data?.message || '註冊失敗'}
+        </div>
       )}
     </form>
   );

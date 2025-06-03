@@ -13,7 +13,9 @@ export default function LoginPage() {
         </div>
         <LoginForm loginMutation={loginMutation} />
         <div className="text-center">
-          <Link to="/register" className="text-indigo-600 hover:underline">還沒有帳號？註冊</Link>
+          <Link to="/register" className="text-indigo-600 hover:underline">
+            還沒有帳號？註冊
+          </Link>
         </div>
       </div>
     </div>

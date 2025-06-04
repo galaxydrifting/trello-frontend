@@ -28,7 +28,7 @@ const BoardListPage = () => {
   if (isError) return <ErrorMessage message="無法取得看板列表" />;
 
   return (
-    <div className="p-4">
+    <div className="p-4 pt-24 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">看板列表</h1>
       <BoardCreateForm
         newBoardName={newBoardName}

@@ -35,9 +35,7 @@ describe('BoardCardEditForm', () => {
   it('呼叫 onEditCard 當失去焦點', async () => {
     const onEditCard = vi.fn();
     render(
-      <BoardEditContext.Provider
-        value={{ ...fullContextValue, onEditCard }}
-      >
+      <BoardEditContext.Provider value={{ ...fullContextValue, onEditCard }}>
         <BoardCardEditForm card={baseCard} onEditCard={onEditCard} titlePlaceholder="標題" />
       </BoardEditContext.Provider>
     );
@@ -52,9 +50,7 @@ describe('BoardCardEditForm', () => {
   it('呼叫 onEditCard 當按下儲存', async () => {
     const onEditCard = vi.fn();
     render(
-      <BoardEditContext.Provider
-        value={{ ...fullContextValue, onEditCard }}
-      >
+      <BoardEditContext.Provider value={{ ...fullContextValue, onEditCard }}>
         <BoardCardEditForm card={baseCard} onEditCard={onEditCard} titlePlaceholder="標題" />
       </BoardEditContext.Provider>
     );

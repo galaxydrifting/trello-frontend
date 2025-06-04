@@ -9,7 +9,7 @@ const mockLoginRoute = async (page: Page) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ token: 'mock-token', user: { email: postData.email } }),
+        body: JSON.stringify({ token: 'mock-token', email: postData.email, name: 'Test User' }),
       });
     } else {
       // 模擬登入失敗

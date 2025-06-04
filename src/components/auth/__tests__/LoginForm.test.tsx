@@ -5,12 +5,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LoginForm } from '../LoginForm';
 import { UseMutationResult } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
-import type { LoginForm as ILoginForm, LoginResponse, LoginError } from '../types';
+import type { LoginForm as ILoginForm, AuthResponse, LoginError } from '../types';
 
 describe('LoginForm', () => {
   // idle 狀態 mock
   const mockLoginMutationIdle: UseMutationResult<
-    AxiosResponse<LoginResponse>,
+    AxiosResponse<AuthResponse>,
     LoginError,
     ILoginForm,
     unknown
@@ -92,7 +92,7 @@ describe('LoginForm', () => {
   it('應該在有錯誤時顯示錯誤訊息', () => {
     // error 狀態 mock
     const mockMutationWithError: UseMutationResult<
-      AxiosResponse<LoginResponse>,
+      AxiosResponse<AuthResponse>,
       LoginError,
       ILoginForm,
       unknown

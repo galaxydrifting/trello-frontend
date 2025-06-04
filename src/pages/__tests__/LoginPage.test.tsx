@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import userEvent from '@testing-library/user-event';
 import LoginPage from '../LoginPage';
+import { Provider } from 'react-redux';
+import store from '../../store';
 
 // Mock 路由 hook
 vi.mock('react-router-dom', async () => {
@@ -26,11 +28,13 @@ describe('LoginPage 整合測試', () => {
 
   const renderLoginPage = () => {
     return render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <LoginPage />
-        </BrowserRouter>
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <LoginPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </Provider>
     );
   };
 
@@ -57,17 +61,23 @@ describe('LoginPage 整合測試', () => {
       };
     });
     const mockToken = 'mock-token';
-    const mockPost = vi.fn().mockResolvedValue({ data: { token: mockToken } });
+    const mockPost = vi
+      .fn()
+      .mockResolvedValue({
+        data: { token: mockToken, email: 'test@example.com', name: 'Test User' },
+      });
     vi.doMock('../../api/config', () => ({
       default: { post: mockPost },
     }));
     const { default: LoginPage } = await import('../LoginPage');
     render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <LoginPage />
-        </BrowserRouter>
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <LoginPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </Provider>
     );
     await user.type(screen.getByPlaceholderText(/電子郵件/i), 'test@example.com');
     await user.type(screen.getByPlaceholderText(/密碼/i), 'password123');
@@ -112,11 +122,13 @@ describe('LoginPage 整合測試', () => {
     }));
     const { default: LoginPage } = await import('../LoginPage');
     render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <LoginPage />
-        </BrowserRouter>
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <LoginPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </Provider>
     );
     await user.type(screen.getByPlaceholderText(/電子郵件/i), 'test@example.com');
     await user.type(screen.getByPlaceholderText(/密碼/i), 'wrongpassword');

@@ -3,10 +3,10 @@ import { AxiosResponse } from 'axios';
 import { UseMutationResult } from '@tanstack/react-query';
 import { ErrorMessage } from './ErrorMessage';
 import { SubmitButton } from './SubmitButton';
-import { LoginForm as ILoginForm, LoginResponse, LoginError } from './types';
+import { LoginForm as ILoginForm, AuthResponse, LoginError } from './types';
 
 interface LoginFormProps {
-  loginMutation: UseMutationResult<AxiosResponse<LoginResponse>, LoginError, ILoginForm, unknown>;
+  loginMutation: UseMutationResult<AxiosResponse<AuthResponse>, LoginError, ILoginForm, unknown>;
 }
 
 export const LoginForm = ({ loginMutation }: LoginFormProps) => {

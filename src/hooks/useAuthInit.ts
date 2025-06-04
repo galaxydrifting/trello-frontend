@@ -22,7 +22,6 @@ const useAuthInit = () => {
         if (res.data && res.data.email && res.data.name) {
           dispatch(
             setUser({
-              token,
               email: res.data.email,
               name: res.data.name,
             })

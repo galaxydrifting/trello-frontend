@@ -20,7 +20,6 @@ export function useLoginMutation() {
         localStorage.setItem('token', response.data.token);
         dispatch(
           setUser({
-            token: response.data.token,
             email: response.data.email,
             name: response.data.name,
           })

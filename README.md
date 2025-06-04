@@ -10,6 +10,7 @@
 - TypeScript
 - Tailwind CSS
 - @tanstack/react-query 5.x
+- redux toolkit（狀態管理）
 - react-hook-form + yup（表單驗證）
 - Vite
 - Vitest + React Testing Library（單元測試）
@@ -33,8 +34,20 @@
 - `src/hooks/`：自訂 hooks
 - `src/api/`：API 請求封裝
 - `src/router/`：路由設定
+- `src/store/`：Redux 狀態管理（user 狀態）
 - `e2e/`：E2E 測試
 - `src/__tests__/`：單元測試
+
+## 狀態管理（Redux）
+
+本專案使用 Redux Toolkit 管理全域狀態，主要用於保存登入使用者資訊（email、name），協助元件間共享登入狀態。token 僅儲存在 localStorage，僅於 API 請求時取用，不會進入 Redux 狀態。
+
+Redux 相關檔案位於 `src/store/`，主要結構如下：
+
+- `src/store/index.ts`：Redux store 建立與設定
+- `src/store/userSlice.ts`：使用者狀態（user）slice，僅保存 email、name，包含登入、登出、還原狀態等 reducer
+
+登入、註冊、初始化等流程會自動同步 Redux 狀態與 localStorage，確保頁面刷新後仍可還原登入資訊。
 
 ## 安裝與啟動
 

@@ -76,10 +76,16 @@ const BoardCardEditForm = ({
   };
 
   const handleSave = async () => {
-    if (onEditCard && editor) {
-      await onEditCard(card.id, editTitle, editor.getHTML());
+    try {
+      if ((onEditCard || contextOnEditCard) && editor) {
+        await (onEditCard || contextOnEditCard)(card.id, editTitle, editor.getHTML());
+      }
+    } catch (error) {
+      // 記錄錯誤資訊
+      console.error('[BoardCardEditForm] 儲存卡片失敗', error);
+    } finally {
+      if (setEditMode) setEditMode(false);
     }
-    if (setEditMode) setEditMode(false);
   };
 
   const isTempCard = card.id.startsWith('temp-');

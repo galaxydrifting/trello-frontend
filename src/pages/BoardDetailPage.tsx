@@ -106,7 +106,7 @@ const BoardDetailPage = () => {
 
   return (
     <BoardEditContext.Provider value={boardEditContextValue}>
-      <div className="p-4">
+      <div className="p-4 pt-24 min-h-screen">
         <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
         <AddListForm />
         {localLists.length === 0 ? (

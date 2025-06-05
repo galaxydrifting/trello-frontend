@@ -1,4 +1,4 @@
-# Trello-Frontend
+![Trello-Frontend Demo](./public/demo.jpg)
 
 ## 專案簡介
 
